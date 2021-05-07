@@ -119,31 +119,16 @@ export class formBuilderDialogPage implements OnInit {
                       }
                     }
                     for(var arr of keyValues) {
-                        if(arr == "name") {
-                          this.formBuilderForm.value[`${arr}`] = this.name;
-                        }
-                        if(arr == "email") {
-                          this.formBuilderForm.value[`${arr}`] = this.email;
-                        }
-                        if(arr == "gender") {
-                          this.formBuilderForm.value[`${arr}`] = this.gender;
-                        }
-                        if(arr == "adhaarNumber") {
-                          this.formBuilderForm.value[`${arr}`] = this.adhaarNumber;
-                        }
-                        if(arr == "address") {
-                          this.formBuilderForm.value[`${arr}`] = this.address;
-                        }
-                        if(arr == "mobileno") {
-                          this.formBuilderForm.value[`${arr}`] = this.mobileno;
-                        }
-                        if(arr == "birthDate") {
-                          this.formBuilderForm.value[`${arr}`] = this.name;
-                        }
-                        if(arr == "country") {
-                          this.formBuilderForm.value[`${arr}`] = this.country;
-                        }
+                        if(arr == "name")  this.formBuilderForm.value[`${arr}`] = this.name;
+                        else if(arr == "email") this.formBuilderForm.value[`${arr}`] = this.email;                        
+                        else if(arr == "gender") this.formBuilderForm.value[`${arr}`] = this.gender;                        
+                        else if(arr == "adhaarNumber") this.formBuilderForm.value[`${arr}`] = this.adhaarNumber;                        
+                        else if(arr == "address") this.formBuilderForm.value[`${arr}`] = this.address;                        
+                        else if(arr == "mobileno") this.formBuilderForm.value[`${arr}`] = this.mobileno;                        
+                        else if(arr == "birthDate") this.formBuilderForm.value[`${arr}`] = this.name;                        
+                        else if(arr == "country") this.formBuilderForm.value[`${arr}`] = this.country;   
                     }                   
+
                     console.log(this.formBuilderForm.value);
                     this.formBuilderForm.value.createdAt = this.myDate;
                     this.formBuilderService.updateFormBuilderServiceByName(this.eMail, this.adhaarNumber, this.formBuilderForm.value).subscribe(data => {

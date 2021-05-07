@@ -114,7 +114,12 @@ const getData = async (req, res) => {
 /** Update formData */
 const updateData = async (req, res) => {
     
-    const adhaarNumber = Number(req.body.adhaarNumber);
+    const adhaarNumber = req.body.adhaarNumber;
+    const email = req.body.email;
+
+    console.log("adhaarNumber", adhaarNumber);
+    console.log("email", email);
+
     console.log('req', req.body);
         setUserData = {
            name: req.body.formData.name,
@@ -133,7 +138,7 @@ const updateData = async (req, res) => {
        console.log('setData', setUserData),
        console.log('setData', setUserDetails),
 
-       await schema.User.findOneAndUpdate({ adhaarNumber: adhaarNumber},
+       await schema.User.findOneAndUpdate({ email: email},
             {$set: setUserData},
             {new : true},
             (err, doc) => {
@@ -159,20 +164,9 @@ const updateData = async (req, res) => {
                     })
                 }
                 res.status(200).json(response);
-            }).catch(err => {
-                res.status(500).json({
-                    message: "Data not updated",
-                    error: err,
-                    errorhandler: {
-                        request: {
-                            type: 'GET',
-                            url: 'http://localhost:3000/get-form-data/',
-                        }
-                    }
-                })
             })
 
-            await schema.userDetails.findOneAndUpdate({ adhaarNumber: adhaarNumber},
+            await schema.userDetails.findOneAndUpdate({adhaarNumber: adhaarNumber},
                 {$set: setUserDetails},
                 {new : true},
                 (err, doc) => {
@@ -199,17 +193,6 @@ const updateData = async (req, res) => {
                         })
                     }
                     res.status(200).json(response);
-                }).catch(err => {
-                    res.status(500).json({
-                        message: "Data not updated",
-                        error: err,
-                        errorhandler: {
-                            request: {
-                                type: 'GET',
-                                url: 'http://localhost:3000/get-form-data/',
-                            }
-                        }
-                    })
                 })
 }
 
