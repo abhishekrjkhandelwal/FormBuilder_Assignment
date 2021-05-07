@@ -113,35 +113,28 @@ const getData = async (req, res) => {
 
 /** Update formData */
 const updateData = async (req, res) => {
-    const user = new schema.User({
-        adhaarNumber: req.body.adhaarNumber,
-    });
-
-   await schema.User.aggregate([
-        {
-            $lookup:
-            {
-                from: "userDetails",
-                localField: "userdetails",
-                foreignField: "fid",
-                as: "creators"
-            }
-        },
-    ])
-    .then(     
-        setData = {
+    
+    const adhaarNumber = Number(req.body.adhaarNumber);
+    console.log('req', req.body);
+        setUserData = {
            name: req.body.formData.name,
            email: req.body.formData.email,
            gender: req.body.formData.gender, 
-           adhaarNumber: req.body.formData.adhaarNumber,
-           address: req.body.formData.address,
-           mobileno: req.body.formData.mobileno,
-           birthDate: req.body.formData.birthDate,
-           country: req.body.formData.country,
         },
-         
-       await schema.User.findOneAndUpdate({ name: user.adhaarNumber},
-            {$set: setData},
+
+        setUserDetails = {
+            adhaarNumber: req.body.formData.adhaarNumber,
+            address: req.body.formData.address,
+            mobileno: req.body.formData.mobileno,
+            birthDate: req.body.formData.birthDate,
+            country: req.body.formData.country, 
+        }
+        
+       console.log('setData', setUserData),
+       console.log('setData', setUserDetails),
+
+       await schema.User.findOneAndUpdate({ adhaarNumber: adhaarNumber},
+            {$set: setUserData},
             {new : true},
             (err, doc) => {
                  if(err) {
@@ -158,10 +151,6 @@ const updateData = async (req, res) => {
                             name: doc.name,
                             email: doc.email,
                             gender: doc.gender,
-                            birthDate: doc.creators[0].birthDate,
-                            address: doc.creators[0].address,
-                            mobileno: doc.creators[0].mobileno,
-                            country: doc.creators[0].country,
                             request: {
                                 type: 'PUT',
                                 url: 'http://localhost:3000//update-form-data/' + doc._id,
@@ -182,7 +171,46 @@ const updateData = async (req, res) => {
                     }
                 })
             })
-    );
+
+            await schema.userDetails.findOneAndUpdate({ adhaarNumber: adhaarNumber},
+                {$set: setUserDetails},
+                {new : true},
+                (err, doc) => {
+                     if(err) {
+                         console.log("wrong when data updating");
+                     }
+                     console.log(doc);
+                  }).then(documents => {
+                    const response = {
+                        count: documents.length,
+                        formdata: documents.map(doc => {
+                            return {
+                                message: "update form data",
+                                address: doc.address,
+                                adhaarNumber: doc.adhaarNumber,
+                                birthDate: doc.birthDate,
+                                country: doc.country,
+                                mobileno: doc.mobileno,
+                                request: {
+                                    type: 'PUT',
+                                    url: 'http://localhost:3000//update-form-data/' + doc._id,
+                                },
+                            }
+                        })
+                    }
+                    res.status(200).json(response);
+                }).catch(err => {
+                    res.status(500).json({
+                        message: "Data not updated",
+                        error: err,
+                        errorhandler: {
+                            request: {
+                                type: 'GET',
+                                url: 'http://localhost:3000/get-form-data/',
+                            }
+                        }
+                    })
+                })
 }
 
 /** Delete fromData */

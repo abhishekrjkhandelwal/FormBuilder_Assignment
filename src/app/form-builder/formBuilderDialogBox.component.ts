@@ -17,20 +17,20 @@ export class formBuilderDialogPage implements OnInit {
 
       birthDate: any;
       formBuilderForm!: FormGroup;
-      keyUser!: any;
+      adhaarNumber!: any;
       submitted = false;
       formData: any = [];
       countries: string[] = ['USA', 'UK', 'Canada', 'India'];
       default = 'UK';
-      userName!: string;
+      userName!: any;
       mobileNumber = /[0-9\+\-\ ]/;
       emailPattern = "[a-zA-Z0-9_.+-,;]+@(?:(?:[a-zA-Z0-9-]+\.,;)?[a-zA-Z]+\.,;)?(gmail)\.com";
       adhhaarNumber = /^[0-9]{4}[ -]?[0-9]{4}[ -]?[0-9]{4}$/;
       myDate: any = new Date();
       address!: string;
-      adhaarNumber!: string;
       country!: string;
       email!: string;
+      eMail!: string;
       mobileno!: string;
       name!: string;
       gender!: string;
@@ -62,7 +62,12 @@ export class formBuilderDialogPage implements OnInit {
          country: ['', [Validators.required]],
         });
         
-        this.keyUser = this.formBuilderService.getAdhaarNumber();
+        this.adhaarNumber = this.formBuilderService.getData().adhaarNumber;
+        this.eMail = this.formBuilderService.getData().email;
+
+        console.log("this.adhaarNumber", this.adhaarNumber)
+        console.log("this.eMail", this.eMail)
+
         this.getData(); 
       }
 
@@ -113,38 +118,56 @@ export class formBuilderDialogPage implements OnInit {
                            keyValues.push(Object.keys(key)) 
                       }
                     }
-                    
                     for(var arr of keyValues) {
-                        delete this.formBuilderForm.value[`${arr}`];
+                        if(arr == "name") {
+                          this.formBuilderForm.value[`${arr}`] = this.name;
+                        }
+                        if(arr == "email") {
+                          this.formBuilderForm.value[`${arr}`] = this.email;
+                        }
+                        if(arr == "gender") {
+                          this.formBuilderForm.value[`${arr}`] = this.gender;
+                        }
+                        if(arr == "adhaarNumber") {
+                          this.formBuilderForm.value[`${arr}`] = this.adhaarNumber;
+                        }
+                        if(arr == "address") {
+                          this.formBuilderForm.value[`${arr}`] = this.address;
+                        }
+                        if(arr == "mobileno") {
+                          this.formBuilderForm.value[`${arr}`] = this.mobileno;
+                        }
+                        if(arr == "birthDate") {
+                          this.formBuilderForm.value[`${arr}`] = this.name;
+                        }
+                        if(arr == "country") {
+                          this.formBuilderForm.value[`${arr}`] = this.country;
+                        }
                     }                   
                     console.log(this.formBuilderForm.value);
                     this.formBuilderForm.value.createdAt = this.myDate;
-                    this.formBuilderService.updateFormBuilderServiceByName(this.keyUser, this.formBuilderForm.value).subscribe(data => {
+                    this.formBuilderService.updateFormBuilderServiceByName(this.eMail, this.adhaarNumber, this.formBuilderForm.value).subscribe(data => {
                        this.getData();
                   });
               }
 
         getData(): void {
-                    const adhaarNumber = this.formBuilderService.getAdhaarNumber();
-
-                    console.log("AdhaarNumber", adhaarNumber);
+                    console.log("AdhaarNumber---->", this.adhaarNumber);
 
                     this.formBuilderService.getFormData().subscribe(data => {
                     console.log('data', data.formdata[0]);
                     
                    for(let row in data.formdata)
-                      if(adhaarNumber == data.formdata[row].adhaarNumber) {
+                      if(this.adhaarNumber == data.formdata[row].creators[row].adhaarNumber) {
                       this.name = data.formdata[row].name,
-                      console.log('name------->', this.name);
                       this.email = data.formdata[row].email,
-                      this.gender = data.formdata[row].gender,
-                      this.adhaarNumber = data.formdata[row].adhaarNumber;
-                      console.log('name------->', this.adhaarNumber);
-                      this.country = data.formdata[row].country,
-                      this.mobileNumber = data.formdata[row].mobileNumber,
-                      this.birthDate = data.formdata[row].birthDate,
-                      this.address = data.formdata[row].address,
-                      this.mobileno = data.formdata[row].mobileno
+                      this.adhaarNumber = data.formdata[row].creators[row].adhaarNumber;
+                      this.country = data.formdata[row].creators[0].country,
+                      this.mobileNumber = data.formdata[row].creators[0].mobileNumber,
+                      this.birthDate = data.formdata[row].creators[0].birthDate,
+                      this.address = data.formdata[row].creators[0].address,
+                      this.mobileno = data.formdata[row].creators[0].mobileno;
+                      this.gender = data.formdata[row].gender;
                     }
                 });
         }

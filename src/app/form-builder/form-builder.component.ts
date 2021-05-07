@@ -16,16 +16,16 @@ import { Router } from '@angular/router';
 
 export class FormBuilderComponent implements OnInit {
 
-  public birthDate: any;
+  birthDate: any;
   adhaarNumber : String[] = [];
-  public emailList: string[] = [];
-  public formBuilderForm!: FormGroup;
-  public submitted = false;
-  public formData: any = [];
-  public countries: string[] = ['USA', 'UK', 'Canada', 'India'];
+  emailList: string[] = [];
+  formBuilderForm!: FormGroup;
+  submitted = false;
+  formData: any = [];
+  countries: string[] = ['USA', 'UK', 'Canada', 'India'];
   default = 'UK';
-  public userName!: string;
-  public imagePreview!: any;
+  userName!: string;
+  imagePreview!: any;
   myDate: any = new Date();
   emailPattern = "[a-zA-Z0-9_.+-,;]+@(?:(?:[a-zA-Z0-9-]+\.,;)?[a-zA-Z]+\.,;)?(gmail)\.com";
   adhhaarNumber = /^[0-9]{4}[ -]?[0-9]{4}[ -]?[0-9]{4}$/;
@@ -120,8 +120,8 @@ export class FormBuilderComponent implements OnInit {
     }
   }
 
-   openformBuilderDialog(event: Event, keyUser: number): void {
-    this.formBuilderService.setAdhaarNumber(keyUser);
+   openformBuilderDialog(event: Event, email: string, keyUser: number): void {
+    this.formBuilderService.setData(email, keyUser);
     let dialogRef = this.dialog.open(formBuilderDialogPage, {
         minWidth: '400px',
         minHeight: '620px'

@@ -14,6 +14,7 @@ export class FormBuilderService {
 
   baseUrl = 'http://localhost:3000/api';
   adhaarNumber!: number;
+  email!: string; 
 
   // API for get form data by form builder
   getFormData(): Observable<any> {
@@ -31,25 +32,23 @@ export class FormBuilderService {
       postData,
     };
     
-    console.log('userData', userData);
-
      return this.http.post<Form[]>(this.baseUrl + '/post-form-data', userData)
        .pipe(tap(data => JSON.stringify(data), catchError(this.errorHandler)));
     }
 
-    // http client api for update user
-    updateFormBuilderServiceByName(adhaarNumber: number, formData: Form): Observable<Form> {
+    //http client api for update user
+    updateFormBuilderServiceByName(email:string, adhaarNumber: number, formData: Form): Observable<Form> {
       const userInfo = {
+        email,
         adhaarNumber,
         formData
-      };
-      console.log('userInfo', userInfo);
-      return this.http.put<Form>(this.baseUrl + '/update-form-data' , userInfo)
+       };
+       console.log('userInfo', userInfo);
+       return this.http.put<Form>(this.baseUrl + '/update-form-data' , userInfo)
       .pipe(tap(data => JSON.stringify(data), catchError(this.errorHandler)));
     }
     
-    deleteFormDataByName(name: string, mobileno: number) {
-     
+    deleteFormDataByName(name: string, mobileno: number) {     
       const options = {
         headers: new HttpHeaders({
           'Content-Type': 'application/json',
@@ -66,12 +65,18 @@ export class FormBuilderService {
       .pipe(tap(data =>console.log(JSON.stringify(data)), catchError(this.errorHandler)));
     }
 
-    setAdhaarNumber(adhaarNumber: number) {
+    setData(email: string, adhaarNumber: number) {
        this.adhaarNumber = adhaarNumber;
+       this.email = email;
     }
 
-    getAdhaarNumber() {
-       return this.adhaarNumber;
+    getData() {
+      const email = this.email;
+      const adhaarNumber = this.adhaarNumber;
+       return {
+          email,
+          adhaarNumber
+       }     
     }
 
     // error handler
