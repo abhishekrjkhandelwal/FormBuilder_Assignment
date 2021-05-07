@@ -7,15 +7,14 @@
         <form [formGroup] = "formBuilderForm" id="formBuilderForm" (ngSubmit)="updateFormBuilderByName()">
             <div class="name">
               <mat-form-field>  
-                <input matInput name="name" formControlName="name" type="name" placeholder="Enter Username" [ngClass] = "{'is-invalid': (submitted || formBuilderForm.controls.name.touched) && formBuilderForm.controls.name.errors }"  size="10"/>
+                <input matInput name="name" formControlName="name" type="name" placeholder="Enter Username" value="{{ name }}" [ngClass] = "{'is-invalid': (submitted || formBuilderForm.controls.name.touched) && formBuilderForm.controls.name.errors }"  size="10"/>
                   <mat-error>
-                    <div *ngIf="formBuilderForm.value.name.length !== 0">
+                    <div>
                       <div *ngIf="((submitted || formBuilderForm.controls.name.touched) && formBuilderForm.controls.name.errors)" class="invalid-input"></div>
                     </div>
-                    <div *ngIf="formBuilderForm.controls.name.errors?.required">name is required && only 20 characters allowed</div>
                   </mat-error>
               </mat-form-field>
-              <mat-slide-toggle [checked]="name_is_active" (change)="name_is_active = $event.source.checked">Toggle me!
+              <mat-slide-toggle [checked]="name_is_active" (change)="name_is_active = $event.source.checked">
               </mat-slide-toggle>
             </div>
 
@@ -23,14 +22,12 @@
              <mat-form-field class="email">
               <input matInput name="email" formControlName="email" type="text" placeholder="E-Mail" value="{{ email }}" [ngClass] = "{'is-invalid': (submitted || formBuilderForm.controls.email.touched) && formBuilderForm.controls.email.errors }" />
               <mat-error>
-                <div *ngIf="formBuilderForm.value.email.length !== 0">
+                <div>
                   <div *ngIf="((submitted || formBuilderForm.controls.email.touched) && formBuilderForm.controls.email.errors),"  class="invalid-input">Enter Valid Email Id</div>
                 </div>
-                <div *ngIf="formBuilderForm.controls.email.errors?.required">Email is required</div>
               </mat-error>
             </mat-form-field>
-            <mat-slide-toggle [checked]="email_is_active" (change)="email_is_active = $event.source.checked">Toggle me!
-            </mat-slide-toggle>
+            <mat-slide-toggle [checked]="email_is_active" (change)="email_is_active = $event.source.checked"></mat-slide-toggle>
             </div>
 
 
@@ -39,7 +36,7 @@
               <input type="radio" formControlName="gender" value="male" required> Male
               <input type="radio" formControlName="gender" value="female"required> Female
               <br />
-              <mat-slide-toggle [checked]="gender_is_active" (change)="gender_is_active = $event.source.checked">Toggle me!
+              <mat-slide-toggle [checked]="gender_is_active" (change)="gender_is_active = $event.source.checked">
               </mat-slide-toggle>
             </div>
 
@@ -49,13 +46,12 @@
              <mat-form-field class="number">
               <input matInput name="adhaarNumber" formControlName="adhaarNumber"  placeholder="Adhaar Number" value="{{ adhaarNumber }}"  [ngClass] = "{'is-invalid': (submitted || formBuilderForm.controls.adhaarNumber.touched) && formBuilderForm.controls.adhaarNumber.errors }" />
               <mat-error>
-                <div *ngIf="formBuilderForm.value.adhaarNumber.length !== 0">
+                <div>
                   <div *ngIf="((submitted || formBuilderForm.controls.adhaarNumber.touched) && formBuilderForm.controls.adhaarNumber.errors),"  class="invalid-input">Enter Valid Adhaar Number</div>
                 </div>
-                <div *ngIf="formBuilderForm.controls.adhaarNumber.errors?.required">Adhaar Number is required</div>
               </mat-error>
               </mat-form-field>
-              <mat-slide-toggle [checked]="adhaarNumber_is_active" (change)="adhaarNumber_is_active = $event.source.checked">Toggle me!
+              <mat-slide-toggle [checked]="adhaarNumber_is_active" (change)="adhaarNumber_is_active = $event.source.checked">
               </mat-slide-toggle>
             </div>
             
@@ -63,13 +59,12 @@
             <mat-form-field class="address">
               <input matInput name="address" formControlName="address"  placeholder="Address" value="{{ address }}" [ngClass] = "{'is-invalid': (submitted || formBuilderForm.controls.address.touched) && formBuilderForm.controls.address.errors }" />
               <mat-error>
-                <div *ngIf="formBuilderForm.value.address.length !== 0">
+                <div>
                   <div *ngIf="((submitted || formBuilderForm.controls.address.touched) && formBuilderForm.controls.address.errors),"  class="invalid-input">Enter Valid Address</div>
                 </div>
-                <div *ngIf="formBuilderForm.controls.address.errors?.required">Address is required</div>
               </mat-error>
              </mat-form-field>
-             <mat-slide-toggle [checked]="address_is_active" (change)="address_is_active = $event.source.checked">Toggle me!
+             <mat-slide-toggle [checked]="address_is_active" (change)="address_is_active = $event.source.checked">
             </mat-slide-toggle>
            </div>
             
@@ -77,13 +72,12 @@
             <mat-form-field class="mobileno">
               <input matInput name="mobileno" formControlName="mobileno"  placeholder="Mobile No." value="{{ mobileno }}" [ngClass] = "{'is-invalid': (submitted || formBuilderForm.controls.mobileno.touched) && formBuilderForm.controls.mobileno.errors }" minlength="10" maxlength="10"/>
               <mat-error>
-                <div *ngIf="formBuilderForm.value.mobileno.length !== 0">
+                <div>
                   <div *ngIf="((submitted || formBuilderForm.controls.mobileno.touched) && formBuilderForm.controls.mobileno.errors),"  class="invalid-input">Enter Valid Mobile No.</div>
                 </div>
-                <div *ngIf="formBuilderForm.controls.mobileno.errors?.required">Mobile No. is required</div>
               </mat-error>
             </mat-form-field>
-            <mat-slide-toggle [checked]="mobileno_is_active" (change)="mobileno_is_active = $event.source.checked">Toggle me!
+            <mat-slide-toggle [checked]="mobileno_is_active" (change)="mobileno_is_active = $event.source.checked">
             </mat-slide-toggle>
           </div>
 
@@ -91,7 +85,7 @@
             <h3>Date of Birth</h3>
             <input type="date"  class="form-control" id="birthDate" [ngModel]="birthDate | date: 'yyyy-MM-dd'" formControlName="birthDate" name="birthDate" />
             <br />
-            <mat-slide-toggle [checked]="birthDate_is_active" (change)="birthDate_is_active = $event.source.checked">Toggle me!
+            <mat-slide-toggle [checked]="birthDate_is_active" (change)="birthDate_is_active = $event.source.checked">
             </mat-slide-toggle>
           </div>
 
@@ -102,7 +96,7 @@
              <select id="country" formControlName="country"> {{ country }}
                <option *ngFor="let c of countries" [ngValue]="c">{{ c }}</option>
              </select>
-             <mat-slide-toggle [checked]="country_is_active" (change)="country_is_active = $event.source.checked">Toggle me!
+             <mat-slide-toggle [checked]="country_is_active" (change)="country_is_active = $event.source.checked">
             </mat-slide-toggle>
             </div>
 

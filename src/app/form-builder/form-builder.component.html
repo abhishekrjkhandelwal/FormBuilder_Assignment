@@ -6,7 +6,7 @@
         <input matInput name="name" formControlName="name" type="name" placeholder="Enter Username" [ngClass] = "{'is-invalid': (submitted || formBuilderForm.controls.name.touched) && formBuilderForm.controls.name.errors }" />
           <mat-error>
             <div *ngIf="formBuilderForm.value.name.length != 0">
-              <div *ngIf="((submitted || formBuilderForm.controls.name.touched) && formBuilderForm.controls.name.errors)" class="invalid-input"></div>
+              <div *ngIf="((submitted || formBuilderForm.controls.name.touched) && formBuilderForm.controls.name.errors)" class="invalid-input">Enter Valid username</div>
             </div>
             <div *ngIf="formBuilderForm.controls.name.errors?.required">name is required && only 20 characters allowed</div>
           </mat-error>
@@ -71,12 +71,14 @@
      <input type="date"  class="form-control" id="birthDate" [ngModel]="birthDate | date: 'yyyy-MM-dd'" formControlName="birthDate" name="birthDate" />
     
      <br /> 
+     <br />
      
      <h3>Country</h3>
      <select id="country" formControlName="country">
        <option *ngFor="let c of countries" [ngValue]="c">{{ c }}</option>
      </select>
 
+     <br />
      <br />
 
      <div>
@@ -118,13 +120,13 @@
         <td>{{ formdata.name }}</td>
         <td>{{ formdata.email }}</td>
         <td>{{ formdata.gender }}</td>
-        <td>{{ formdata.birthDate }}</td>
-        <td>{{ formdata.adhaarNumber }}</td>
-        <td>{{ formdata.country }}</td>
-        <td>{{ formdata.address }}</td>
-        <td>{{ formdata.mobileno }}</td>
+        <td>{{ formdata.creators[i].birthDate }}</td>
+        <td>{{ formdata.creators[i].adhaarNumber }}</td>
+        <td>{{ formdata.creators[i].country }}</td>
+        <td>{{ formdata.creators[i].address }}</td>
+        <td>{{ formdata.creators[i].mobileno }}</td>
         <td>{{ formdata.createdAt }}</td>
-        <td><button id="update" (click)="openformBuilderDialog($event, formdata.name)">Update</button></td>
+        <td><button id="update" (click)="openformBuilderDialog($event, formdata.adhaarNumber)">Update</button></td>
         <td><button id="delete" (click)="deleteFormDataByName($event, formdata.name, formdata.mobileno, i)" >Delete</button></td>   
      </tr>
    </tbody>

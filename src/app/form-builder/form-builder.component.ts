@@ -69,7 +69,7 @@ export class FormBuilderComponent implements OnInit {
   }
 
   commaSepEmail = (control: AbstractControl): { [key: string]: String } | any => {
-    if (control.value){
+    if (control.value) {
         var emails= control.value.split(', ');
         const forbidden = emails.some((email:any) => Validators.email(new FormControl(email)));
         console.log(forbidden);
@@ -78,10 +78,10 @@ export class FormBuilderComponent implements OnInit {
   };
 
     postFormData() {
-        let name = this.formBuilderForm.value.name;
+        let adhaarNumber = this.formBuilderForm.value.adhaarNumber;
         this.formBuilderForm.value.createdAt = this.myDate;
       
-        if(!this.adhaarNumber.includes(name)) {
+        if(!this.adhaarNumber.includes(adhaarNumber)) {
               this.formBuilderService.postFormData(this.formBuilderForm.value, this.formBuilderForm.value.image).subscribe( data => {
               if(data) {
                  this.getData();
@@ -95,6 +95,7 @@ export class FormBuilderComponent implements OnInit {
   async getData() {
        await this.formBuilderService.getFormData().subscribe(data => {
         this.formData = data.formdata;
+        console.log('fromdata', this.formData);
         this.newDynamic = {name: this.formData.name , email: this.formData.email, gender: this.formData.gender, adhaarNumber: this.formData.adhaarNumber, addess: this.formData.address, mobileno: this.formData.mobileno, birthDate: this.formData.birthDate, country: this.formData.country};
         this.dynamicArray.push(this.newDynamic);
         for (var adhaarNumber of data.formdata) {
@@ -119,8 +120,8 @@ export class FormBuilderComponent implements OnInit {
     }
   }
 
-   openformBuilderDialog(event: Event, keyUser: string): void {
-    this.formBuilderService.setUserName(keyUser);
+   openformBuilderDialog(event: Event, keyUser: number): void {
+    this.formBuilderService.setAdhaarNumber(keyUser);
     let dialogRef = this.dialog.open(formBuilderDialogPage, {
         minWidth: '400px',
         minHeight: '620px'

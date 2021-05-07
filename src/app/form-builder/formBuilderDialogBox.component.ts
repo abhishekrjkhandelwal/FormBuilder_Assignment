@@ -62,7 +62,7 @@ export class formBuilderDialogPage implements OnInit {
          country: ['', [Validators.required]],
         });
         
-        this.keyUser = this.formBuilderService.getUserName();
+        this.keyUser = this.formBuilderService.getAdhaarNumber();
         this.getData(); 
       }
 
@@ -125,17 +125,27 @@ export class formBuilderDialogPage implements OnInit {
               }
 
         getData(): void {
+                    const adhaarNumber = this.formBuilderService.getAdhaarNumber();
+
+                    console.log("AdhaarNumber", adhaarNumber);
+
                     this.formBuilderService.getFormData().subscribe(data => {
-                    console.log(data); 
-                    this.name = data.formdata[0].name,
-                    this.email = data.formdata[0].email,
-                    this.gender = data.formdata[0].gender,
-                    this.adhaarNumber = data.formdata[0].adhaarNumber;
-                    this.country = data.formdata[0].country,
-                    this.mobileNumber = data.formdata[0].mobileNumber,
-                    this.birthDate = data.formdata[0].birthDate,
-                    this.address = data.formdata[0].address,
-                    this.mobileno = data.formdata[0].mobileno
+                    console.log('data', data.formdata[0]);
+                    
+                   for(let row in data.formdata)
+                      if(adhaarNumber == data.formdata[row].adhaarNumber) {
+                      this.name = data.formdata[row].name,
+                      console.log('name------->', this.name);
+                      this.email = data.formdata[row].email,
+                      this.gender = data.formdata[row].gender,
+                      this.adhaarNumber = data.formdata[row].adhaarNumber;
+                      console.log('name------->', this.adhaarNumber);
+                      this.country = data.formdata[row].country,
+                      this.mobileNumber = data.formdata[row].mobileNumber,
+                      this.birthDate = data.formdata[row].birthDate,
+                      this.address = data.formdata[row].address,
+                      this.mobileno = data.formdata[row].mobileno
+                    }
                 });
         }
 }

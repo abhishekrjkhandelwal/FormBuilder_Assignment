@@ -1,7 +1,6 @@
 const schema = require('../Models/FormBuilderData');
 const multer = require('multer');
 const { Schema } = require('mongoose');
-const { ConsoleReporter } = require('jasmine');
 
 const MIME_TYPE_MAP = {
     'image/png': 'png',
@@ -46,14 +45,19 @@ const postData = (multer({storage: storage}).single("image"), async (req, res) =
         country: req.body.formData.country
     });
 
-    await user.save(function (err, user) {
-        if (err) return console.error(err);
-           res.status(200).json(user);
+    await user.save().then((user) => {
+          res.status(200).json(user)      
     })
+    .catch((error) => {
+          res.status(400).json({error: error});
+     })
 
-    await userDetails.save(function (err, userDetails) {
-        if (err) return console.error(err);
-        res.status(200).json(userDetails);
+
+    await userDetails.save().then((userDetails) => {
+        res.status(200).json(userDetails)      
+    })
+    .catch((error) => {
+        res.status(400).json({error: error});
     })
 })
 
@@ -70,8 +74,7 @@ const getData = async (req, res) => {
             }
         },
     ]) 
-    .then((err, res) => {
-        if(err) err;
+    .then(
         documents => {
         console.log('documents', documents);
         const response = {
@@ -82,11 +85,7 @@ const getData = async (req, res) => {
                     name: doc.name,
                     email: doc.email,
                     gender: doc.gender,
-                    adhaarNumber: doc.creators[0].adhaarNumber,
-                    birthDate: doc.creators[0].birthDate,
-                    address: doc.creators[0].address,
-                    mobileno: doc.creators[0].mobileno,
-                    country: doc.creators[0].country,
+                    creators: doc.creators,
                     createdAt: doc.createdAt,
                     request: {
                         type: 'GET',
@@ -97,7 +96,6 @@ const getData = async (req, res) => {
         }
         console.log(response);
         res.status(200).json(response);
-       }
     })
     .catch(err => {
         res.status(500).json({
@@ -116,7 +114,7 @@ const getData = async (req, res) => {
 /** Update formData */
 const updateData = async (req, res) => {
     const user = new schema.User({
-        name: req.body.userName,
+        adhaarNumber: req.body.adhaarNumber,
     });
 
    await schema.User.aggregate([
@@ -142,7 +140,7 @@ const updateData = async (req, res) => {
            country: req.body.formData.country,
         },
          
-       await schema.User.findOneAndUpdate({ name: user.name},
+       await schema.User.findOneAndUpdate({ name: user.adhaarNumber},
             {$set: setData},
             {new : true},
             (err, doc) => {

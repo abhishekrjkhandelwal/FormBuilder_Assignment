@@ -13,7 +13,7 @@ export class FormBuilderService {
   constructor(private http: HttpClient) { }
 
   baseUrl = 'http://localhost:3000/api';
-  userName!: string;
+  adhaarNumber!: number;
 
   // API for get form data by form builder
   getFormData(): Observable<any> {
@@ -38,9 +38,9 @@ export class FormBuilderService {
     }
 
     // http client api for update user
-    updateFormBuilderServiceByName(userName: string, formData: Form): Observable<Form> {
+    updateFormBuilderServiceByName(adhaarNumber: number, formData: Form): Observable<Form> {
       const userInfo = {
-        userName,
+        adhaarNumber,
         formData
       };
       console.log('userInfo', userInfo);
@@ -50,7 +50,6 @@ export class FormBuilderService {
     
     deleteFormDataByName(name: string, mobileno: number) {
      
-
       const options = {
         headers: new HttpHeaders({
           'Content-Type': 'application/json',
@@ -67,12 +66,12 @@ export class FormBuilderService {
       .pipe(tap(data =>console.log(JSON.stringify(data)), catchError(this.errorHandler)));
     }
 
-    setUserName(userName: string) {
-       this.userName = userName;
+    setAdhaarNumber(adhaarNumber: number) {
+       this.adhaarNumber = adhaarNumber;
     }
 
-    getUserName() {
-       return this.userName;
+    getAdhaarNumber() {
+       return this.adhaarNumber;
     }
 
     // error handler
