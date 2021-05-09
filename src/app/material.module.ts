@@ -16,7 +16,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatRadioModule } from '@angular/material/radio';
-
+import { MatPaginatorModule } from '@angular/material/paginator';
 
 import { NgModule } from '@angular/core';
 const MATERIAL_MODULES = [
@@ -38,6 +38,7 @@ const MATERIAL_MODULES = [
   MatMenuModule,
   MatDialogModule,
   MatRadioModule,
+  MatPaginatorModule
 ];
 
 @NgModule({

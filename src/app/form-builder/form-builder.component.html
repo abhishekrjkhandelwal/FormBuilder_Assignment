@@ -100,7 +100,7 @@
 <br />
 <br />
 
-<table class="styled-table" style="margin: 20% 15% 20% 15%">
+<table class="styled-table" style="margin: 20% 15% 10% 15%">
    <thead>
      <th>Name</th>
      <th>Email</th>
@@ -131,3 +131,8 @@
      </tr>
    </tbody>
 </table>
+
+<mat-paginator [length]="totalPosts"  [pageSize]="postsPerPage" [pageSizeOptions]="pageSizeOptions" (page)="onChangedPage($event)" ></mat-paginator>
+
+<br />
+<br />

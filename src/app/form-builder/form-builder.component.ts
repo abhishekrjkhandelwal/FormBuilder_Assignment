@@ -9,6 +9,7 @@ import { Router } from '@angular/router';
 import { SnackbarService } from '../Services/snackbar.service';
 import { indicate } from '../operator'
 import { Subject } from 'rxjs';
+import { PageEvent } from '@angular/material/paginator';
 
 @Component({
   selector: 'app-form-builder',
@@ -40,7 +41,10 @@ export class FormBuilderComponent implements OnInit {
   adhhaarNumber = /^[0-9]{4}[ -]?[0-9]{4}[ -]?[0-9]{4}$/;
   mobileNumber = /[0-9\+\-\ ]/;
   address = /^[#.0-9a-zA-Z\s,-]+$/;
-  
+  totalPosts = 10;
+  postsPerPage = 2;
+  pageSizeOptions = [1, 2, 3, 4, 5, 6];
+  currentPage = 1;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -55,6 +59,7 @@ export class FormBuilderComponent implements OnInit {
 
   ngOnInit(): void {
     this.getData();
+    this.formBuilderService.getFormData(this.postsPerPage, this.currentPage);
     this.birthDate = new Date();
     this.formBuilderForm = this.formBuilder.group({
       name: ['', [Validators.required, Validators.maxLength(20), Validators.minLength(1), Validators.pattern(/^\S+[a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z]*)*$/)]],
@@ -80,6 +85,12 @@ export class FormBuilderComponent implements OnInit {
     if(this.updateData) {
       this.formData = this.updateData.formdata;
     }
+  }
+
+  onChangedPage(pageData: PageEvent) {
+    this.currentPage = pageData.pageIndex + 1;
+    this.postsPerPage = pageData.pageSize;
+    this.getData();
   }
 
   commaSepEmail = (control: AbstractControl): { [key: string]: String } | any => {
@@ -126,9 +137,9 @@ export class FormBuilderComponent implements OnInit {
         }
   } 
 
-  async getData() {
+   getData() {
       try {
-        await this.formBuilderService.getFormData().pipe(indicate(this.loading$)).subscribe(data => {
+          this.formBuilderService.getFormData(this.postsPerPage, this.currentPage).pipe(indicate(this.loading$)).subscribe(data => {
           this.formData = data.formdata;
           for (var adhaarNumber of data.formdata) {
              this.adhaarNumber.push(adhaarNumber.adhaarNumber);    
@@ -139,7 +150,6 @@ export class FormBuilderComponent implements OnInit {
          this.snackbarService.openSnackBar("unable to fetch data");
        }
   }
-
 
    openformBuilderDialog(event: Event, email: string, keyUser: number): void {
     this.formBuilderService.setData(email, keyUser);

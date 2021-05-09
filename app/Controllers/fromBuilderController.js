@@ -79,8 +79,11 @@ const postData = async (req, res) => {
     })
 }
 
-/** fetch fromData */
+/** fetch formData */
 const getData = async (req, res) => {
+    var pageSize = +req.query.pageSize;
+    var currentPage = +req.query.page;
+    console.log("pageSize", pageSize, currentPage);
     await schema.User.aggregate([
         {
             $lookup:
@@ -91,8 +94,14 @@ const getData = async (req, res) => {
                 as: "creators"
             }
         },
-    ]) 
-    .then(
+        {
+            $skip:  (pageSize * (currentPage - 1))
+        },
+
+        {
+            $limit: (pageSize)  
+        }
+    ]).then(
         documents => {
         const response = {
             count: documents.length,
@@ -111,6 +120,7 @@ const getData = async (req, res) => {
                 }
             })
         }
+        console.log("response", response);
         res.status(200).json(response);
     })
     .catch(err => {

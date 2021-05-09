@@ -149,6 +149,7 @@ export class formBuilderDialogPage implements OnInit {
                     console.log("AdhaarNumber---->", this.adhaarNumber);
                     try {
                     this.formBuilderService.getFormData().pipe(indicate(this.loading$)).subscribe(data => {
+                      console.log("formdata", data.formdata);
                     for(let row in data.formdata) {
                       if(this.adhaarNumber == data.formdata[row].creators[row].adhaarNumber) {
                       this.name = data.formdata[row].name,

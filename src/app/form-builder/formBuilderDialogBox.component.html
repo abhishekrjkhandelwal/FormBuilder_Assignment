@@ -19,18 +19,17 @@
             </div>
 
             <div>
-             <mat-form-field class="email">
-              <input matInput name="email" formControlName="email" type="text" placeholder="E-Mail" value="{{ email }}" [ngClass] = "{'is-invalid': (submitted || formBuilderForm.controls.email.touched) && formBuilderForm.controls.email.errors }" />
-              <mat-error>
-                <div>
-                  <div *ngIf="((submitted || formBuilderForm.controls.email.touched) && formBuilderForm.controls.email.errors),"  class="invalid-input">Enter Valid Email Id</div>
-                </div>
-              </mat-error>
-            </mat-form-field>
-            <mat-slide-toggle [checked]="email_is_active" (change)="email_is_active = $event.source.checked"></mat-slide-toggle>
+              <mat-form-field class="email">
+                <input matInput name="email" formControlName="email" type="text" placeholder="E-Mail" value="{{ email }}" [ngClass] = "{'is-invalid': (submitted || formBuilderForm.controls.email.touched) && formBuilderForm.controls.email.errors }" />
+                 <mat-error>
+                   <div>
+                     <div *ngIf="((submitted || formBuilderForm.controls.email.touched) && formBuilderForm.controls.email.errors),"  class="invalid-input">Enter Valid Email Id</div>
+                   </div>
+                 </mat-error>
+               </mat-form-field>
+              <mat-slide-toggle [checked]="email_is_active" (change)="email_is_active = $event.source.checked"></mat-slide-toggle>
             </div>
-
-
+            
             <div>
               <h3>Gender</h3>
               <input type="radio" formControlName="gender" value="male" required> Male

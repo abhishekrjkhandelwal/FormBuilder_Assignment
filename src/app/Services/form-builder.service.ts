@@ -18,8 +18,13 @@ export class FormBuilderService {
   updateData: any;
 
   // API for get form data by form builder
-  getFormData(): Observable<any> {
-    return this.http.get<any>(this.baseUrl + '/get-form-data')
+  getFormData(postsPerPage?: number, currentPage?: number): Observable<any> {
+
+    const queryParams = `?pageSize=${postsPerPage}&page=${currentPage}`;
+
+    console.log("queryParams", queryParams);
+
+    return this.http.get<any>(this.baseUrl + '/get-form-data' + queryParams)
     .pipe(tap(data => JSON.stringify(data), catchError(this.errorHandler)));
   }
 
