@@ -6,6 +6,9 @@ import { formBuilderDialogPage } from './formBuilderDialogBox.component';
 import { mimeType } from './mime-type.validator';
 import { DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
+import { SnackbarService } from '../Services/snackbar.service';
+import { indicate } from '../operator'
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-form-builder',
@@ -13,6 +16,7 @@ import { Router } from '@angular/router';
   styleUrls: ['./form-builder.component.css'],
   providers: [ DatePipe ]
 })
+
 
 export class FormBuilderComponent implements OnInit {
 
@@ -29,10 +33,14 @@ export class FormBuilderComponent implements OnInit {
   userName!: string;
   imagePreview!: any;
   myDate: any = new Date();
+  loading$ = new Subject<boolean>();
+  
+  //validate patterns
   emailPattern = "[a-zA-Z0-9_.+-,;]+@(?:(?:[a-zA-Z0-9-]+\.,;)?[a-zA-Z]+\.,;)?(gmail)\.com";
   adhhaarNumber = /^[0-9]{4}[ -]?[0-9]{4}[ -]?[0-9]{4}$/;
   mobileNumber = /[0-9\+\-\ ]/;
   address = /^[#.0-9a-zA-Z\s,-]+$/;
+  
 
   constructor(
     private formBuilder: FormBuilder,
@@ -40,6 +48,7 @@ export class FormBuilderComponent implements OnInit {
     private dialog: MatDialog,
     private datePipe:  DatePipe,
     private router: Router,
+    private snackbarService: SnackbarService,
   ) { 
     this.myDate = this.datePipe.transform(this.myDate, 'yyyy-MM-dd');
   }
@@ -49,9 +58,7 @@ export class FormBuilderComponent implements OnInit {
     this.birthDate = new Date();
     this.formBuilderForm = this.formBuilder.group({
       name: ['', [Validators.required, Validators.maxLength(20), Validators.minLength(1), Validators.pattern(/^\S+[a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z]*)*$/)]],
-      email: ['', Validators.compose([
-        Validators.required, this.commaSepEmail
-      ]) ],
+      email: ['', Validators.compose([Validators.required, this.commaSepEmail]) ],
       gender: ['male', [Validators.required]],
       birthDate: [' ', [Validators.required]],
       adhaarNumber: ['', [Validators.required, Validators.pattern(this.adhhaarNumber)]],
@@ -70,10 +77,8 @@ export class FormBuilderComponent implements OnInit {
 
   ngAfterContentChecked() {
     this.updateData = this.formBuilderService.getUpdateData();
-    console.log("uuuuuuuupppppppppppdateeeee", this.updateData);
     if(this.updateData) {
       this.formData = this.updateData.formdata;
-      console.log("update wala data", this.formData);
     }
   }
 
@@ -104,27 +109,35 @@ export class FormBuilderComponent implements OnInit {
     postFormData() {
         let adhaarNumber = this.formBuilderForm.value.adhaarNumber;
         this.formBuilderForm.value.createdAt = this.myDate;
-        if(!this.adhaarNumber.includes(adhaarNumber)) {
-          console.log('this', this.formBuilderForm.value.image);
-              this.formBuilderService.postFile(this.formBuilderForm.value.image).subscribe(data => console.log(data));
-              this.formBuilderService.postFormData(this.formBuilderForm.value).subscribe( data => {
-              if(data) {
-                 this.getData();
-              }
-        });
-       } else {
-         console.log("adhaarNumber is already registered please try another");
-       }
+        try {
+          if(!this.adhaarNumber.includes(adhaarNumber)) {
+            console.log('this', this.formBuilderForm.value.image);
+                this.formBuilderService.postFile(this.formBuilderForm.value.image).subscribe(data => console.log(data));
+                this.formBuilderService.postFormData(this.formBuilderForm.value).pipe(indicate(this.loading$)).subscribe( data => {
+                if(data) {
+                   this.getData();
+                }
+          });
+         } else {
+           this.snackbarService.openSnackBar("Adhaar Number Already exists Try another")
+         }
+        } catch(e) {
+          this.snackbarService.openSnackBar("Unable to post data");
+        }
   } 
 
   async getData() {
-       await this.formBuilderService.getFormData().subscribe(data => {
-        this.formData = data.formdata;
-        console.log('fromdata', this.formData);
-        for (var adhaarNumber of data.formdata) {
-           this.adhaarNumber.push(adhaarNumber.adhaarNumber);    
-        }
-     });
+      try {
+        await this.formBuilderService.getFormData().pipe(indicate(this.loading$)).subscribe(data => {
+          this.formData = data.formdata;
+          for (var adhaarNumber of data.formdata) {
+             this.adhaarNumber.push(adhaarNumber.adhaarNumber);    
+          }
+          this.snackbarService.openSnackBar("List Of User Details");
+       });  
+       } catch(e) {
+         this.snackbarService.openSnackBar("unable to fetch data");
+       }
   }
 
 
@@ -138,8 +151,13 @@ export class FormBuilderComponent implements OnInit {
    }
 
    deleteFormDataByName(event: Event, keyUser: string, keyMobileNo: number ,index: number) {
-      this.formBuilderService.deleteFormDataByName(keyUser, keyMobileNo).subscribe(data => {
-        this.formData.splice(index, 1);
-      });
+        try { 
+            this.formBuilderService.deleteFormDataByName(keyUser, keyMobileNo).pipe(indicate(this.loading$)).subscribe(data => {
+            this.formData.splice(index, 1);
+            this.snackbarService.openSnackBar("User Deleted Successfully");
+          });
+        } catch(e) {
+            this.snackbarService.openSnackBar("unable to deleted user");
+        }
    }
 }

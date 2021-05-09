@@ -3,7 +3,9 @@ import { MatDialogRef } from '@angular/material/dialog';
 import { FormGroup, Validators, FormControl, AbstractControl, FormBuilder } from '@angular/forms';
 import { FormBuilderService } from '../Services/form-builder.service';
 import { DatePipe } from '@angular/common';
-
+import { SnackbarService } from '../Services/snackbar.service';
+import { indicate } from '../operator'
+import { Subject } from 'rxjs';
 
 @Component ({
     selector: 'formBuilderDialogPage',
@@ -37,7 +39,8 @@ export class formBuilderDialogPage implements OnInit {
       name!: string;
       gender!: string;
       toggleOption: any;
-      
+      loading$ = new Subject<boolean>();
+
       public name_is_active: any;
       email_is_active = false;
       gender_is_active = false;
@@ -101,6 +104,7 @@ export class formBuilderDialogPage implements OnInit {
           private dialogRef: MatDialogRef<formBuilderDialogPage>,
           private formBuilderService: FormBuilderService,
           private datePipe:  DatePipe,
+          private snakbarService: SnackbarService,
         ) {
           this.myDate = this.datePipe.transform(this.myDate, 'yyyy-MM-dd');
          }
@@ -131,16 +135,20 @@ export class formBuilderDialogPage implements OnInit {
 
                     console.log(this.formBuilderForm.value);
                     this.formBuilderForm.value.createdAt = this.myDate;
-                    this.formBuilderService.updateFormBuilderServiceByName(this.eMail, this.adhaarNumber, this.formBuilderForm.value).subscribe(data => {  
-                      console.log("data", data);
-                  });
+                    try {
+                      this.formBuilderService.updateFormBuilderServiceByName(this.eMail, this.adhaarNumber, this.formBuilderForm.value).pipe(indicate(this.loading$)).subscribe(data => {  
+                        console.log("data", data);
+                        this.snakbarService.openSnackBar("User Details upadted");
+                    });
+                    } catch(e) {
+                       this.snakbarService.openSnackBar("unable to update data");
+                    }
               }
 
         getData(): void {
                     console.log("AdhaarNumber---->", this.adhaarNumber);
-
-                    this.formBuilderService.getFormData().subscribe(data => {
-                    console.log('data', data.formdata[0]);                    
+                    try {
+                    this.formBuilderService.getFormData().pipe(indicate(this.loading$)).subscribe(data => {
                     for(let row in data.formdata) {
                       if(this.adhaarNumber == data.formdata[row].creators[row].adhaarNumber) {
                       this.name = data.formdata[row].name,
@@ -154,6 +162,10 @@ export class formBuilderDialogPage implements OnInit {
                       this.gender = data.formdata[row].gender;
                       }
                     }
+                    this.snakbarService.openSnackBar("Fetch User Details")
                 });
+              } catch(e) {
+                this.snakbarService.openSnackBar("unable to fetch user Details");
+              }
         }
 }
