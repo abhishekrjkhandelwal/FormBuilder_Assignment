@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
 import { FormGroup, Validators, FormControl, AbstractControl, FormBuilder } from '@angular/forms';
 import { FormBuilderService } from '../Services/form-builder.service';
@@ -14,6 +14,8 @@ import { DatePipe } from '@angular/common';
 
 
 export class formBuilderDialogPage implements OnInit {
+
+      @Output() updateData: any = new EventEmitter<any>();
 
       birthDate: any;
       formBuilderForm!: FormGroup;
@@ -70,8 +72,6 @@ export class formBuilderDialogPage implements OnInit {
 
         this.getData(); 
       }
-
-    
 
       ngDoCheck() {
         this.toggleOption = [
@@ -131,8 +131,8 @@ export class formBuilderDialogPage implements OnInit {
 
                     console.log(this.formBuilderForm.value);
                     this.formBuilderForm.value.createdAt = this.myDate;
-                    this.formBuilderService.updateFormBuilderServiceByName(this.eMail, this.adhaarNumber, this.formBuilderForm.value).subscribe(data => {
-                       this.getData();
+                    this.formBuilderService.updateFormBuilderServiceByName(this.eMail, this.adhaarNumber, this.formBuilderForm.value).subscribe(data => {  
+                      console.log("data", data);
                   });
               }
 
@@ -140,9 +140,8 @@ export class formBuilderDialogPage implements OnInit {
                     console.log("AdhaarNumber---->", this.adhaarNumber);
 
                     this.formBuilderService.getFormData().subscribe(data => {
-                    console.log('data', data.formdata[0]);
-                    
-                   for(let row in data.formdata)
+                    console.log('data', data.formdata[0]);                    
+                    for(let row in data.formdata) {
                       if(this.adhaarNumber == data.formdata[row].creators[row].adhaarNumber) {
                       this.name = data.formdata[row].name,
                       this.email = data.formdata[row].email,
@@ -153,6 +152,7 @@ export class formBuilderDialogPage implements OnInit {
                       this.address = data.formdata[row].creators[0].address,
                       this.mobileno = data.formdata[row].creators[0].mobileno;
                       this.gender = data.formdata[row].gender;
+                      }
                     }
                 });
         }

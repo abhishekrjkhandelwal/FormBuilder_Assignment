@@ -15,4 +15,6 @@ router.put('/update-form-data', formBuilderController.updateData);
 /** API for delete Form data */
 router.delete('/delete-form-data-by-name', formBuilderController.deleteData);
 
+router.post('/post-file', formBuilderController.sendFile);
+
 module.exports = router;

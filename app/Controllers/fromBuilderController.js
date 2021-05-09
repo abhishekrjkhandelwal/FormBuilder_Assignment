@@ -1,6 +1,5 @@
 const schema = require('../Models/FormBuilderData');
 const multer = require('multer');
-const { Schema } = require('mongoose');
 
 const MIME_TYPE_MAP = {
     'image/png': 'png',
@@ -15,7 +14,7 @@ const storage = multer.diskStorage({
         if(isValid) {
             error = null;
         }
-        cb(null, "../../app/images/");
+        cb(null, "../images");
     },
     filename: (req, file, cb) => {
         const name = file.originalname.toLowerCase().split(' ').join('-');
@@ -24,10 +23,29 @@ const storage = multer.diskStorage({
     }
 });
 
-/** Post fromData */
-const postData = (multer({storage: storage}).single("image"), async (req, res) => {
+var upload = multer({storage: storage});
 
-    
+const sendFile = (upload.single("file"), (req, res) =>  {
+    //console.log("sendFIle")
+    //const promise =  new Promise((resolve, reject) => {
+       //console.log("inside Promise");
+    //    if(!req.file) {
+    //        throw Error("FILE_MISSING");
+    //    } else {
+//        console.log('imageaajaa', req.body)
+ //          resolve("done");
+       //   });
+     //  console.log("outside promise");
+//       return promise;        
+})
+
+
+/** Post fromData */
+const postData = async (req, res) => {
+   // await sendFile().then(data => console.log('File Uploaded Successfully'));
+
+   // console.log("file upload ho gaye hi")
+
     const user = new schema.User({
         name: req.body.formData.name,
         email: req.body.formData.email,
@@ -59,7 +77,7 @@ const postData = (multer({storage: storage}).single("image"), async (req, res) =
     .catch((error) => {
         res.status(400).json({error: error});
     })
-})
+}
 
 /** fetch fromData */
 const getData = async (req, res) => {
@@ -76,7 +94,6 @@ const getData = async (req, res) => {
     ]) 
     .then(
         documents => {
-        console.log('documents', documents);
         const response = {
             count: documents.length,
             formdata: documents.map(doc => {
@@ -94,7 +111,6 @@ const getData = async (req, res) => {
                 }
             })
         }
-        console.log(response);
         res.status(200).json(response);
     })
     .catch(err => {
@@ -117,10 +133,6 @@ const updateData = async (req, res) => {
     const adhaarNumber = req.body.adhaarNumber;
     const email = req.body.email;
 
-    console.log("adhaarNumber", adhaarNumber);
-    console.log("email", email);
-
-    console.log('req', req.body);
         setUserData = {
            name: req.body.formData.name,
            email: req.body.formData.email,
@@ -135,9 +147,6 @@ const updateData = async (req, res) => {
             country: req.body.formData.country, 
         }
         
-       console.log('setData', setUserData),
-       console.log('setData', setUserDetails),
-
        await schema.User.findOneAndUpdate({ email: email},
             {$set: setUserData},
             {new : true},
@@ -145,26 +154,7 @@ const updateData = async (req, res) => {
                  if(err) {
                      console.log("wrong when data updating");
                  }
-                 console.log(doc);
-              }).then(documents => {
-                const response = {
-                    count: documents.length,
-                    formdata: documents.map(doc => {
-                        return {
-                            message: "update form data",
-                            _id: doc._id,
-                            name: doc.name,
-                            email: doc.email,
-                            gender: doc.gender,
-                            request: {
-                                type: 'PUT',
-                                url: 'http://localhost:3000//update-form-data/' + doc._id,
-                            },
-                        }
-                    })
-                }
-                res.status(200).json(response);
-            })
+              })
 
             await schema.userDetails.findOneAndUpdate({adhaarNumber: adhaarNumber},
                 {$set: setUserDetails},
@@ -173,18 +163,30 @@ const updateData = async (req, res) => {
                      if(err) {
                          console.log("wrong when data updating");
                      }
-                     console.log(doc);
-                  }).then(documents => {
+                  })
+            
+            await schema.User.aggregate([
+                    {
+                        $lookup:
+                        {
+                            from: "userDetails",
+                            localField: "userdetails",
+                            foreignField: "fid",
+                            as: "creators"
+                        }
+                    },
+                ]) 
+                .then(documents => {
+                    console.log("documents", documents);
                     const response = {
-                        count: documents.length,
                         formdata: documents.map(doc => {
                             return {
                                 message: "update form data",
-                                address: doc.address,
-                                adhaarNumber: doc.adhaarNumber,
-                                birthDate: doc.birthDate,
-                                country: doc.country,
-                                mobileno: doc.mobileno,
+                                name: doc.name,
+                                email: doc.email,
+                                gender: doc.gender,
+                                creators: doc.creators,
+                                createdAt: doc.createdAt,
                                 request: {
                                     type: 'PUT',
                                     url: 'http://localhost:3000//update-form-data/' + doc._id,
@@ -193,7 +195,7 @@ const updateData = async (req, res) => {
                         })
                     }
                     res.status(200).json(response);
-                })
+                }).catch(err => {err});
 }
 
 /** Delete fromData */
@@ -230,5 +232,6 @@ module.exports = {
     postData: postData,
     getData: getData,
     updateData: updateData,
-    deleteData: deleteData
+    deleteData: deleteData,
+    sendFile: sendFile,
 }

@@ -1,4 +1,4 @@
-import { Component, OnInit, SimpleChange } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators, FormArray } from '@angular/forms';
 import { FormBuilderService } from '../Services/form-builder.service';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
@@ -16,6 +16,8 @@ import { Router } from '@angular/router';
 
 export class FormBuilderComponent implements OnInit {
 
+
+  updateData: any;
   birthDate: any;
   adhaarNumber : String[] = [];
   emailList: string[] = [];
@@ -31,8 +33,6 @@ export class FormBuilderComponent implements OnInit {
   adhhaarNumber = /^[0-9]{4}[ -]?[0-9]{4}[ -]?[0-9]{4}$/;
   mobileNumber = /[0-9\+\-\ ]/;
   address = /^[#.0-9a-zA-Z\s,-]+$/;
-  newDynamic: any =  {};
-  dynamicArray: any = [];
 
   constructor(
     private formBuilder: FormBuilder,
@@ -68,6 +68,15 @@ export class FormBuilderComponent implements OnInit {
     this.formBuilderForm.controls.country.setValue(this.default, {onlySelf: true});
   }
 
+  ngAfterContentChecked() {
+    this.updateData = this.formBuilderService.getUpdateData();
+    console.log("uuuuuuuupppppppppppdateeeee", this.updateData);
+    if(this.updateData) {
+      this.formData = this.updateData.formdata;
+      console.log("update wala data", this.formData);
+    }
+  }
+
   commaSepEmail = (control: AbstractControl): { [key: string]: String } | any => {
     if (control.value) {
         var emails= control.value.split(', ');
@@ -76,34 +85,6 @@ export class FormBuilderComponent implements OnInit {
         return forbidden ? { 'email': { value: control.value.trim() } } : null;
     }
   };
-
-    postFormData() {
-        let adhaarNumber = this.formBuilderForm.value.adhaarNumber;
-        this.formBuilderForm.value.createdAt = this.myDate;
-      
-        if(!this.adhaarNumber.includes(adhaarNumber)) {
-              this.formBuilderService.postFormData(this.formBuilderForm.value, this.formBuilderForm.value.image).subscribe( data => {
-              if(data) {
-                 this.getData();
-              }
-        });
-       } else {
-         console.log("adhaarNumber is already registered please try another");
-       }
-  } 
-
-  async getData() {
-       await this.formBuilderService.getFormData().subscribe(data => {
-        this.formData = data.formdata;
-        console.log('fromdata', this.formData);
-        this.newDynamic = {name: this.formData.name , email: this.formData.email, gender: this.formData.gender, adhaarNumber: this.formData.adhaarNumber, addess: this.formData.address, mobileno: this.formData.mobileno, birthDate: this.formData.birthDate, country: this.formData.country};
-        this.dynamicArray.push(this.newDynamic);
-        for (var adhaarNumber of data.formdata) {
-           this.adhaarNumber.push(adhaarNumber.adhaarNumber);    
-        }
-     });
-  }
-
 
   onImagePicked(event: any) {
     const file = (event.target as HTMLInputElement).files?.item(0);
@@ -119,6 +100,33 @@ export class FormBuilderComponent implements OnInit {
         reader.readAsDataURL(file);
     }
   }
+
+    postFormData() {
+        let adhaarNumber = this.formBuilderForm.value.adhaarNumber;
+        this.formBuilderForm.value.createdAt = this.myDate;
+        if(!this.adhaarNumber.includes(adhaarNumber)) {
+          console.log('this', this.formBuilderForm.value.image);
+              this.formBuilderService.postFile(this.formBuilderForm.value.image).subscribe(data => console.log(data));
+              this.formBuilderService.postFormData(this.formBuilderForm.value).subscribe( data => {
+              if(data) {
+                 this.getData();
+              }
+        });
+       } else {
+         console.log("adhaarNumber is already registered please try another");
+       }
+  } 
+
+  async getData() {
+       await this.formBuilderService.getFormData().subscribe(data => {
+        this.formData = data.formdata;
+        console.log('fromdata', this.formData);
+        for (var adhaarNumber of data.formdata) {
+           this.adhaarNumber.push(adhaarNumber.adhaarNumber);    
+        }
+     });
+  }
+
 
    openformBuilderDialog(event: Event, email: string, keyUser: number): void {
     this.formBuilderService.setData(email, keyUser);

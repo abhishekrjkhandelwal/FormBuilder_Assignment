@@ -15,6 +15,7 @@ export class FormBuilderService {
   baseUrl = 'http://localhost:3000/api';
   adhaarNumber!: number;
   email!: string; 
+  updateData: any;
 
   // API for get form data by form builder
   getFormData(): Observable<any> {
@@ -23,32 +24,40 @@ export class FormBuilderService {
   }
 
   // API for post data from formbuilder
-  postFormData(formData: Form, image: File): Observable<Form[]> {
-    const postData = new FormData(); 
-    postData.append("image", image);
-     
-    const userData = {
-      formData,
-      postData,
-    };
-    
-     return this.http.post<Form[]>(this.baseUrl + '/post-form-data', userData)
+  postFormData(formData: Form): Observable<any> {
+    const userData = {formData}
+    console.log("userData", userData);
+     return this.http.post<any>(this.baseUrl + '/post-form-data', userData)
        .pipe(tap(data => JSON.stringify(data), catchError(this.errorHandler)));
     }
 
+    postFile(image: File): Observable<any> {
+      const imageName = image.name
+      const postData = new FormData();
+      postData.append("file", image, imageName);     
+      
+      postData.getAll('file');
+
+      const pData = postData.getAll('file');
+      console.log("pData", typeof pData);
+
+      const headers = new HttpHeaders();
+      headers.append('Content-Type', 'multipart/form-data');
+      
+      return this.http.post<any>(this.baseUrl + '/post-file', postData, {headers: headers})
+      .pipe(tap(data => console.log(JSON.stringify(data)), catchError(this.errorHandler)));
+    } 
+
     //http client api for update user
-    updateFormBuilderServiceByName(email:string, adhaarNumber: number, formData: Form): Observable<Form> {
-
-      console.log("adhaarNumberrrrrrrrrrr", adhaarNumber);
-
+    updateFormBuilderServiceByName(email:string, adhaarNumber: number, formData: Form): Observable<any> {
       const userInfo = {
         email,
         adhaarNumber,
         formData
        };
        console.log('userInfo', userInfo);
-       return this.http.put<Form>(this.baseUrl + '/update-form-data' , userInfo)
-      .pipe(tap(data => JSON.stringify(data), catchError(this.errorHandler)));
+       return this.http.put<any>(this.baseUrl + '/update-form-data' , userInfo)
+      .pipe(tap(data => this.updateData = data), catchError(this.errorHandler));
     }
     
     deleteFormDataByName(name: string, mobileno: number) {     
@@ -80,6 +89,11 @@ export class FormBuilderService {
           email,
           adhaarNumber
        }     
+    }
+
+    getUpdateData() {
+        const updateDATA = this.updateData;
+        return updateDATA;
     }
 
     // error handler
