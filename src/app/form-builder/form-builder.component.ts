@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, ViewChild, ElementRef } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators, FormArray } from '@angular/forms';
 import { FormBuilderService } from '../Services/form-builder.service';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
@@ -21,6 +21,7 @@ import { PageEvent } from '@angular/material/paginator';
 
 export class FormBuilderComponent implements OnInit {
 
+  @ViewChild('fileInput', { static: false }) fileInput!: ElementRef;
 
   updateData: any;
   birthDate: any;
@@ -35,7 +36,7 @@ export class FormBuilderComponent implements OnInit {
   imagePreview!: any;
   myDate: any = new Date();
   loading$ = new Subject<boolean>();
-  
+  FILE: any;
   //validate patterns
   emailPattern = "[a-zA-Z0-9_.+-,;]+@(?:(?:[a-zA-Z0-9-]+\.,;)?[a-zA-Z]+\.,;)?(gmail)\.com";
   adhhaarNumber = /^[0-9]{4}[ -]?[0-9]{4}[ -]?[0-9]{4}$/;
@@ -102,20 +103,38 @@ export class FormBuilderComponent implements OnInit {
     }
   };
 
-  onImagePicked(event: any) {
-    const file = (event.target as HTMLInputElement).files?.item(0);
-    console.log(typeof file);
-    console.log(file);
-    this.formBuilderForm.patchValue({image: file});
-    this.formBuilderForm.get('image')?.updateValueAndValidity();
-    const reader = new FileReader();
-    reader.onload = () => {
-      this.imagePreview = reader.result;
-    };
-    if (file) {
-        reader.readAsDataURL(file);
-    }
+  // onImagePicked(event: any) {
+  //   const file = (event.target as HTMLInputElement).files?.item(0);
+  //   console.log(typeof file);
+  //   console.log(file);
+  //   this.formBuilderForm.patchValue({image: file});
+  //   this.formBuilderForm.get('image')?.updateValueAndValidity();
+  //   const reader = new FileReader();
+  //   reader.onload = () => {
+  //     this.imagePreview = reader.result;
+  //   };
+  //   if (file) {
+  //       reader.readAsDataURL(file);
+  //   }
+  // }
+
+
+  onFileUpload(e: Event) {
+    console.log("inside fileupload")
+    const imageBlob = <File>this.fileInput.nativeElement.files[0];
+    const imageBlob1 = this.fileInput.nativeElement.files[0];
+
+    console.log("imageBlob", typeof imageBlob)
+    console.log("imageBlob1", typeof imageBlob1)
+    
+
+    console.log("imageBlob", imageBlob, imageBlob.name);
+    this.FILE = new FormData();
+    this.FILE.append('file', imageBlob.name);
+    this.FILE.append('file', imageBlob, imageBlob.name);
+    console.log("getall", this.FILE.getAll('file'));
   }
+
 
     postFormData() {
         let adhaarNumber = this.formBuilderForm.value.adhaarNumber;
@@ -123,7 +142,7 @@ export class FormBuilderComponent implements OnInit {
         try {
           if(!this.adhaarNumber.includes(adhaarNumber)) {
             console.log('this', this.formBuilderForm.value.image);
-                this.formBuilderService.postFile(this.formBuilderForm.value.image).subscribe(data => console.log(data));
+                this.formBuilderService.postFile(this.FILE).subscribe(data => console.log(data));
                 this.formBuilderService.postFormData(this.formBuilderForm.value).pipe(indicate(this.loading$)).subscribe( data => {
                 if(data) {
                    this.getData();

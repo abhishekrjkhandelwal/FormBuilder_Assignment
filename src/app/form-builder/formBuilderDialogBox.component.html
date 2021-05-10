@@ -34,9 +34,7 @@
               <h3>Gender</h3>
               <input type="radio" formControlName="gender" value="male" required> Male
               <input type="radio" formControlName="gender" value="female"required> Female
-              <br />
-              <mat-slide-toggle [checked]="gender_is_active" (change)="gender_is_active = $event.source.checked">
-              </mat-slide-toggle>
+              <mat-slide-toggle [checked]="gender_is_active" (change)="gender_is_active = $event.source.checked"></mat-slide-toggle>
             </div>
 
             <br />
@@ -82,7 +80,7 @@
 
           <div>
             <h3>Date of Birth</h3>
-            <input type="date"  class="form-control" id="birthDate" [ngModel]="birthDate | date: 'yyyy-MM-dd'" formControlName="birthDate" name="birthDate" />
+            <input type="date"  class="form-control" id="birthDate" [ngModel]="birthDate" formControlName="birthDate" name="birthDate" />
             <br />
             <mat-slide-toggle [checked]="birthDate_is_active" (change)="birthDate_is_active = $event.source.checked">
             </mat-slide-toggle>

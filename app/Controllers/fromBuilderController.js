@@ -7,44 +7,40 @@ const MIME_TYPE_MAP = {
     'image/jpg': 'jpg'
 }
 
-const storage = multer.diskStorage({
-    destination: (req , file, cb) => {
-        const isValid  = MIME_TYPE_MAP(file.mimetype);
-        let error = new Error("Invalid mime type");
-        if(isValid) {
-            error = null;
-        }
-        cb(null, "../images");
-    },
-    filename: (req, file, cb) => {
-        const name = file.originalname.toLowerCase().split(' ').join('-');
-        const ext = MIME_TYPE_MAP(file.mimetype);
-        cb(null, name + '-', + Date.now() + '.' + ext);
-    }
-});
+// var storage = multer.diskStorage({
+//     destination: function (req, files, cb) {
+//         console.log("mmmmmmmmyyyyyyyyyybody", req.body)
+//       cb(null,  `'${__dirname + '/images/'}'`)
+//     },
+//     filename: function (req, files, cb) {
+//       cb(null, files[0].originalname + '-' + Date.now())
+//     }
+// })
 
-var upload = multer({storage: storage});
+// var upload = multer({storage: storage});
 
-const sendFile = (upload.single("file"), (req, res) =>  {
-    //console.log("sendFIle")
-    //const promise =  new Promise((resolve, reject) => {
-       //console.log("inside Promise");
-    //    if(!req.file) {
-    //        throw Error("FILE_MISSING");
-    //    } else {
-//        console.log('imageaajaa', req.body)
- //          resolve("done");
-       //   });
-     //  console.log("outside promise");
-//       return promise;        
+var upload = multer({ dest: `${__dirname + '/images/'}`, })
+
+const sendFile = (upload.array('file', 2), (req, res) =>  {
+    
+//    const promise =  new Promise((resolve, reject) => {
+       console.log("inside Promise");
+    
+          console.log("body", req.body);
+          console.log('image getting', req.files)
+         // resolve("done");
+         console.log(__dirname + '/images/')
+      console.log("outside promise");
+  //    return promise;        
+  // })
 })
 
 
 /** Post fromData */
 const postData = async (req, res) => {
-   // await sendFile().then(data => console.log('File Uploaded Successfully'));
+//   await sendFile().then(data => console.log('File Uploaded Successfully'));
 
-   // console.log("file upload ho gaye hi")
+   console.log("file upload ho gaye hi")
 
     const user = new schema.User({
         name: req.body.formData.name,
@@ -120,7 +116,6 @@ const getData = async (req, res) => {
                 }
             })
         }
-        console.log("response", response);
         res.status(200).json(response);
     })
     .catch(err => {

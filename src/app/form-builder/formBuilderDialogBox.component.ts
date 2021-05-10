@@ -6,6 +6,8 @@ import { DatePipe } from '@angular/common';
 import { SnackbarService } from '../Services/snackbar.service';
 import { indicate } from '../operator'
 import { Subject } from 'rxjs';
+import { PageEvent } from '@angular/material/paginator';
+
 
 @Component ({
     selector: 'formBuilderDialogPage',
@@ -40,6 +42,10 @@ export class formBuilderDialogPage implements OnInit {
       gender!: string;
       toggleOption: any;
       loading$ = new Subject<boolean>();
+      totalPosts = 10;
+      postsPerPage = 2;
+      pageSizeOptions = [1, 2, 3, 4, 5, 6];
+      currentPage = 1;
 
       public name_is_active: any;
       email_is_active = false;
@@ -52,7 +58,6 @@ export class formBuilderDialogPage implements OnInit {
       resultArray = [];
 
       ngOnInit(): void {
-        console.log('Status', this.name_is_active);
         this.birthDate = new Date();        
         this.formBuilderForm = this.formBuilder.group({
          name: ['', [Validators.required, Validators.maxLength(20), Validators.minLength(1), Validators.pattern(/^\S+[a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z]*)*$/)]],
@@ -66,14 +71,16 @@ export class formBuilderDialogPage implements OnInit {
          address: ['', [Validators.required, Validators.pattern(this.address)]],
          country: ['', [Validators.required]],
         });
-        
+        this.formBuilderForm.controls.country.setValue(this.default, {onlySelf: true});        
         this.adhaarNumber = this.formBuilderService.getData().adhaarNumber;
         this.eMail = this.formBuilderService.getData().email;
+        this.getData();
+      }
 
-        console.log("this.adhaarNumber", this.adhaarNumber)
-        console.log("this.eMail", this.eMail)
-
-        this.getData(); 
+      onChangedPage(pageData: PageEvent) {
+        this.currentPage = pageData.pageIndex + 1;
+        this.postsPerPage = pageData.pageSize;
+        this.getData();
       }
 
       ngDoCheck() {
@@ -132,13 +139,12 @@ export class formBuilderDialogPage implements OnInit {
                         else if(arr == "birthDate") this.formBuilderForm.value[`${arr}`] = this.name;                        
                         else if(arr == "country") this.formBuilderForm.value[`${arr}`] = this.country;   
                     }                   
-
                     console.log(this.formBuilderForm.value);
                     this.formBuilderForm.value.createdAt = this.myDate;
                     try {
                       this.formBuilderService.updateFormBuilderServiceByName(this.eMail, this.adhaarNumber, this.formBuilderForm.value).pipe(indicate(this.loading$)).subscribe(data => {  
                         console.log("data", data);
-                        this.snakbarService.openSnackBar("User Details upadted");
+                        this.snakbarService.openSnackBar("User Details updated");
                     });
                     } catch(e) {
                        this.snakbarService.openSnackBar("unable to update data");
@@ -146,20 +152,19 @@ export class formBuilderDialogPage implements OnInit {
               }
 
         getData(): void {
-                    console.log("AdhaarNumber---->", this.adhaarNumber);
                     try {
-                    this.formBuilderService.getFormData().pipe(indicate(this.loading$)).subscribe(data => {
+                    this.formBuilderService.getFormData(this.postsPerPage, this.currentPage).pipe(indicate(this.loading$)).subscribe(data => {
                       console.log("formdata", data.formdata);
                     for(let row in data.formdata) {
                       if(this.adhaarNumber == data.formdata[row].creators[row].adhaarNumber) {
                       this.name = data.formdata[row].name,
                       this.email = data.formdata[row].email,
                       this.adhaarNumber = data.formdata[row].creators[row].adhaarNumber;
-                      this.country = data.formdata[row].creators[0].country,
-                      this.mobileNumber = data.formdata[row].creators[0].mobileNumber,
-                      this.birthDate = data.formdata[row].creators[0].birthDate,
-                      this.address = data.formdata[row].creators[0].address,
-                      this.mobileno = data.formdata[row].creators[0].mobileno;
+                      this.country = data.formdata[row].creators[row].country,
+                      this.mobileNumber = data.formdata[row].creators[row].mobileNumber,
+                      this.birthDate = data.formdata[row].creators[row].birthDate,
+                      this.address = data.formdata[row].creators[row].address,
+                      this.mobileno = data.formdata[row].creators[row].mobileno;
                       this.gender = data.formdata[row].gender;
                       }
                     }

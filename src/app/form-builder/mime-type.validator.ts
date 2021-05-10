@@ -29,7 +29,6 @@ export const mimeType = (
             break;
           default:
             isValid = false; // Or you can use the blob.type as fallback
-            break;
         }
         if (isValid) {
           observer.next({key: null});

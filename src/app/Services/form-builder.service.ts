@@ -22,10 +22,8 @@ export class FormBuilderService {
 
     const queryParams = `?pageSize=${postsPerPage}&page=${currentPage}`;
 
-    console.log("queryParams", queryParams);
-
     return this.http.get<any>(this.baseUrl + '/get-form-data' + queryParams)
-    .pipe(tap(data => JSON.stringify(data), catchError(this.errorHandler)));
+    .pipe(tap(data => JSON.stringify(data)), catchError(this.errorHandler));
   }
 
   // API for post data from formbuilder
@@ -33,24 +31,17 @@ export class FormBuilderService {
     const userData = {formData}
     console.log("userData", userData);
      return this.http.post<any>(this.baseUrl + '/post-form-data', userData)
-       .pipe(tap(data => JSON.stringify(data), catchError(this.errorHandler)));
+       .pipe(tap(data => JSON.stringify(data)), catchError(this.errorHandler));
     }
 
-    postFile(image: File): Observable<any> {
-      const imageName = image.name
-      const postData = new FormData();
-      postData.append("file", image, imageName);     
+    postFile(image: any): Observable<any> {
       
-      postData.getAll('file');
+      console.log("file---name", image);
 
-      const pData = postData.getAll('file');
-      console.log("pData", typeof pData);
-
-      const headers = new HttpHeaders();
-      headers.append('Content-Type', 'multipart/form-data');
-      
-      return this.http.post<any>(this.baseUrl + '/post-file', postData, {headers: headers})
-      .pipe(tap(data => console.log(JSON.stringify(data)), catchError(this.errorHandler)));
+      console.log("image.getAll('myFile')", image.getAll('myFile'));
+  
+      return this.http.post<any>(this.baseUrl + '/post-file', image)
+      .pipe(tap(data => console.log(JSON.stringify(data))), catchError(this.errorHandler));
     } 
 
     //http client api for update user
@@ -79,7 +70,7 @@ export class FormBuilderService {
       console.log("this.baseUrl + '/delete-form-data-by-name', options'", this.baseUrl + '/delete-form-data-by-name', options);
 
       return this.http.delete(this.baseUrl + '/delete-form-data-by-name', options)
-      .pipe(tap(data =>console.log(JSON.stringify(data)), catchError(this.errorHandler)));
+      .pipe(tap(data =>console.log(JSON.stringify(data))), catchError(this.errorHandler));
     }
 
     setData(email: string, adhaarNumber: number) {

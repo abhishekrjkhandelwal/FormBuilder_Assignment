@@ -9,6 +9,10 @@ mat-form-field {
   mat-spinner {
     margin: auto;
   }
+
+  mat-card {
+    width: 100%;
+  }
   
   .main-div {
     margin-top: 2%;

@@ -1,7 +1,7 @@
 <div class="main-div">
 <mat-card>
   <mat-card-header>Form Builder</mat-card-header>
-  <form [formGroup] = "formBuilderForm" id="formBuilderForm" enctype="multipart/form-data">
+  <form [formGroup] = "formBuilderForm" id="formBuilderForm">
     <mat-form-field>  
         <input matInput name="name" formControlName="name" type="name" placeholder="Enter Username" [ngClass] = "{'is-invalid': (submitted || formBuilderForm.controls.name.touched) && formBuilderForm.controls.name.errors }" />
           <mat-error>
@@ -80,16 +80,22 @@
      <br />
      <br />
 
-     <div>
+     <!-- <div>
         <button mat-stroked-button type="button" (click)="filePicker.click()" >Pick Profile Image</button>
         <input name="filePICK" id="fileItem" accept="image/*" type="file" #filePicker (change)="onImagePicked($event)">
-     </div>
+     </div> -->
+
+       <div>
+         <input #fileInput name="myFile" type="file" (change)="onFileUpload($event)">
+         <button (click)="fileInput.click()" >FILE</button>
+      </div>
 
      
-     <div class="image-preview" *ngIf="imagePreview !== '' && imagePreview && formBuilderForm?.get('image')?.valid" >
+     <!-- <div class="image-preview" *ngIf="imagePreview !== '' && imagePreview && formBuilderForm?.get('image')?.valid" >
        <img [src]="imagePreview" [alt] = "formBuilderForm.value.name">
-     </div>
+     </div> -->
 
+    <br />
     <br />
     <button mat-raised-button color="primary" (click)="postFormData();" [disabled]="(formBuilderForm.value.length === 0)" type="submit">Send</button>
   </form>
