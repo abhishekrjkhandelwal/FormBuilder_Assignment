@@ -21,6 +21,7 @@
     "@angular/platform-browser": "~11.2.11",
     "@angular/platform-browser-dynamic": "~11.2.11",
     "@angular/router": "~11.2.11",
+    "connect-multiparty": "^2.2.0",
     "crypto": "^1.0.1",
     "express": "^4.17.1",
     "express-fileupload": "^1.2.1",

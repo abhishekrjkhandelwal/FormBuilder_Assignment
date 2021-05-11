@@ -1,5 +1,7 @@
 const schema = require('../Models/FormBuilderData');
 const multer = require('multer');
+const fs = require("fs");
+const path = require("path");
 
 const MIME_TYPE_MAP = {
     'image/png': 'png',
@@ -7,46 +9,40 @@ const MIME_TYPE_MAP = {
     'image/jpg': 'jpg'
 }
 
-// var storage = multer.diskStorage({
-//     destination: function (req, files, cb) {
-//         console.log("mmmmmmmmyyyyyyyyyybody", req.body)
-//       cb(null,  `'${__dirname + '/images/'}'`)
-//     },
-//     filename: function (req, files, cb) {
-//       cb(null, files[0].originalname + '-' + Date.now())
-//     }
-// })
+var storage = multer.memoryStorage();
 
-// var upload = multer({storage: storage});
+var upload = multer({storage: storage});
 
-var upload = multer({ dest: `${__dirname + '/images/'}`, })
+var imagePath;
+var url;
+var sendUrl;
 
-const sendFile = (upload.array('file', 2), (req, res) =>  {
-    
-//    const promise =  new Promise((resolve, reject) => {
-       console.log("inside Promise");
-    
-          console.log("body", req.body);
-          console.log('image getting', req.files)
-         // resolve("done");
-         console.log(__dirname + '/images/')
-      console.log("outside promise");
-  //    return promise;        
-  // })
+const sendFile =  (upload.array('file', 2), async (req, res) =>  {
+           if(req.files) {
+           url = req.protocol + '://' + req.get('host');              
+           sendUrl  = url + "/images/" + req.files[0].originalname;
+           imagePath = path.join(__dirname , `../images/${req.files[0].originalname}`)   
+           var writableStream = fs.createWriteStream(imagePath);
+           writableStream.write(req.files[0].buffer);
+          } else {
+              res.satus(400).json({
+                  message: "file is missing",
+              })
+          }
+         res.status(200).json(imagePath); 
 })
 
 
 /** Post fromData */
 const postData = async (req, res) => {
-//   await sendFile().then(data => console.log('File Uploaded Successfully'));
 
-   console.log("file upload ho gaye hi")
-
+    sendFile().then(data => console.log('File Uploaded Successfully'));
     const user = new schema.User({
         name: req.body.formData.name,
         email: req.body.formData.email,
         gender: req.body.formData.gender,
         createdAt: req.body.formData.createdAt,
+        imagePath: sendUrl,
         userdetails: "fid",
     });
     const userDetails = new schema.userDetails({    
@@ -60,7 +56,13 @@ const postData = async (req, res) => {
     });
 
     await user.save().then((user) => {
-          res.status(200).json(user)      
+          res.status(200).json({
+              message: "user created successfully",
+              user: {
+                  ...user,
+                  imagePath: user.sendUrl,
+              }
+          })      
     })
     .catch((error) => {
           res.status(400).json({error: error});
@@ -79,7 +81,6 @@ const postData = async (req, res) => {
 const getData = async (req, res) => {
     var pageSize = +req.query.pageSize;
     var currentPage = +req.query.page;
-    console.log("pageSize", pageSize, currentPage);
     await schema.User.aggregate([
         {
             $lookup:
@@ -107,6 +108,7 @@ const getData = async (req, res) => {
                     name: doc.name,
                     email: doc.email,
                     gender: doc.gender,
+                    imagePath: doc.imagePath,
                     creators: doc.creators,
                     createdAt: doc.createdAt,
                     request: {
@@ -154,6 +156,7 @@ const updateData = async (req, res) => {
         
        await schema.User.findOneAndUpdate({ email: email},
             {$set: setUserData},
+            {useFindAndModify: false},
             {new : true},
             (err, doc) => {
                  if(err) {
@@ -163,6 +166,7 @@ const updateData = async (req, res) => {
 
             await schema.userDetails.findOneAndUpdate({adhaarNumber: adhaarNumber},
                 {$set: setUserDetails},
+                {useFindAndModify: false},
                 {new : true},
                 (err, doc) => {
                      if(err) {
@@ -182,7 +186,6 @@ const updateData = async (req, res) => {
                     },
                 ]) 
                 .then(documents => {
-                    console.log("documents", documents);
                     const response = {
                         formdata: documents.map(doc => {
                             return {
@@ -207,30 +210,36 @@ const updateData = async (req, res) => {
 const deleteData = async (req, res) => {
     const user = new schema.User({
         name: req.body.name,
+        imagePath: req.body.deleteImage
     });   
     const userDetails = new schema.userDetails({
         mobileno: Number(req.body.mobileno),
     })
 
     
-   await schema.User.deleteOne({name: user.name}, function(err) {
-        if(err) {
-            throw err;
-        } else {
-            console.log("deleted");
-        }
-    }).then(
-        await schema.userDetails.deleteOne({mobileno: userDetails.mobileno}, function(err, result) {
+   await schema.User.deleteOne({name: user.name, imagePath: user.imagePath}, function(err) {
+        try {
+            console.log("imagedata", imagePath);
+            fs.unlinkSync(imagePath)
+            console.log("Successfully deleted the file from server")
+            delete imagePath;
+            res.status(200).json({
+                message: "user is deleted"
+            })
+          } catch(err) {
+            res.status(400).json({
+                message: "user not deleted"
+            })   
+            throw err
+          }
+    }) 
+    await schema.userDetails.deleteOne({mobileno: userDetails.mobileno}, function(err, result) {
             if(err) {
                 throw err;
             } else {
                 res.status(200).json(result);
             }
-        })
-        .catch((e) => {
-            console.log('error', error);
-        })
-    )
+    })
 }
 
 module.exports = {

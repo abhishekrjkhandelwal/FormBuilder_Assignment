@@ -31,11 +31,13 @@ const app = express();
    
     mongoose.Promise = global.Promise;
 
-
+  
     app.use(bodyParser.json());
         // for parsing multipart/form-data
     app.use(upload.any()); 
     app.use(bodyParser.urlencoded({extended: true}));
+
+    app.use("/images", express.static(path.join("../FormBuilder/app/images/")))
 
     app.use('/api', formBuilderRoute);
 

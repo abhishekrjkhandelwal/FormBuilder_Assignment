@@ -42,7 +42,7 @@ export class FormBuilderComponent implements OnInit {
   adhhaarNumber = /^[0-9]{4}[ -]?[0-9]{4}[ -]?[0-9]{4}$/;
   mobileNumber = /[0-9\+\-\ ]/;
   address = /^[#.0-9a-zA-Z\s,-]+$/;
-  totalPosts = 10;
+  totalPosts = 20;
   postsPerPage = 2;
   pageSizeOptions = [1, 2, 3, 4, 5, 6];
   currentPage = 1;
@@ -124,17 +124,17 @@ export class FormBuilderComponent implements OnInit {
     const imageBlob = <File>this.fileInput.nativeElement.files[0];
     const imageBlob1 = this.fileInput.nativeElement.files[0];
 
-    console.log("imageBlob", typeof imageBlob)
-    console.log("imageBlob1", typeof imageBlob1)
-    
+    const imageName = imageBlob.name;
+    console.log("imageBlob", typeof imageBlob)    
 
     console.log("imageBlob", imageBlob, imageBlob.name);
     this.FILE = new FormData();
     this.FILE.append('file', imageBlob.name);
-    this.FILE.append('file', imageBlob, imageBlob.name);
+    this.FILE.append('file', imageBlob, imageName);
     console.log("getall", this.FILE.getAll('file'));
   }
-
+   
+    imagePath: any;
 
     postFormData() {
         let adhaarNumber = this.formBuilderForm.value.adhaarNumber;
@@ -142,7 +142,7 @@ export class FormBuilderComponent implements OnInit {
         try {
           if(!this.adhaarNumber.includes(adhaarNumber)) {
             console.log('this', this.formBuilderForm.value.image);
-                this.formBuilderService.postFile(this.FILE).subscribe(data => console.log(data));
+                this.formBuilderService.postFile(this.FILE).subscribe(data => data);
                 this.formBuilderService.postFormData(this.formBuilderForm.value).pipe(indicate(this.loading$)).subscribe( data => {
                 if(data) {
                    this.getData();
@@ -160,6 +160,7 @@ export class FormBuilderComponent implements OnInit {
       try {
           this.formBuilderService.getFormData(this.postsPerPage, this.currentPage).pipe(indicate(this.loading$)).subscribe(data => {
           this.formData = data.formdata;
+          console.log("formdata", this.formData);
           for (var adhaarNumber of data.formdata) {
              this.adhaarNumber.push(adhaarNumber.adhaarNumber);    
           }
@@ -179,9 +180,9 @@ export class FormBuilderComponent implements OnInit {
      dialogRef.afterClosed().subscribe();
    }
 
-   deleteFormDataByName(event: Event, keyUser: string, keyMobileNo: number ,index: number) {
+   deleteFormDataByName(event: Event, deleteImage: string ,keyUser: string, keyMobileNo: number ,index: number) {
         try { 
-            this.formBuilderService.deleteFormDataByName(keyUser, keyMobileNo).pipe(indicate(this.loading$)).subscribe(data => {
+            this.formBuilderService.deleteFormDataByName(deleteImage ,keyUser, keyMobileNo).pipe(indicate(this.loading$)).subscribe(data => {
             this.formData.splice(index, 1);
             this.snackbarService.openSnackBar("User Deleted Successfully");
           });

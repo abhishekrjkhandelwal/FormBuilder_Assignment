@@ -90,11 +90,6 @@
          <button (click)="fileInput.click()" >FILE</button>
       </div>
 
-     
-     <!-- <div class="image-preview" *ngIf="imagePreview !== '' && imagePreview && formBuilderForm?.get('image')?.valid" >
-       <img [src]="imagePreview" [alt] = "formBuilderForm.value.name">
-     </div> -->
-
     <br />
     <br />
     <button mat-raised-button color="primary" (click)="postFormData();" [disabled]="(formBuilderForm.value.length === 0)" type="submit">Send</button>
@@ -108,6 +103,7 @@
 
 <table class="styled-table" style="margin: 20% 15% 10% 15%">
    <thead>
+     <th>Image</th>
      <th>Name</th>
      <th>Email</th>
      <th>Gender</th>
@@ -123,6 +119,9 @@
 
    <tbody>
      <tr *ngFor = "let formdata of formData;let i = index">
+        <td>
+          <img [src] = "formdata.imagePath">
+        </td>
         <td>{{ formdata.name }}</td>
         <td>{{ formdata.email }}</td>
         <td>{{ formdata.gender }}</td>
@@ -133,7 +132,7 @@
         <td>{{ formdata.creators[i].mobileno }}</td>
         <td>{{ formdata.createdAt }}</td>
         <td><button id="update" (click)="openformBuilderDialog($event, formdata.email, formdata.creators[i].adhaarNumber)">Update</button></td>
-        <td><button id="delete" (click)="deleteFormDataByName($event, formdata.name, formdata.creators[i].mobileno , i)" >Delete</button></td>   
+        <td><button id="delete" (click)="deleteFormDataByName($event, formdata.imagePath ,formdata.name, formdata.creators[i].mobileno , i)" >Delete</button></td>   
      </tr>
    </tbody>
 </table>

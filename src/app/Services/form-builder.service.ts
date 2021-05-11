@@ -56,19 +56,19 @@ export class FormBuilderService {
       .pipe(tap(data => this.updateData = data), catchError(this.errorHandler));
     }
     
-    deleteFormDataByName(name: string, mobileno: number) {     
+    deleteFormDataByName(deleteImage: string , name: string, mobileno: number) {     
       const options = {
         headers: new HttpHeaders({
           'Content-Type': 'application/json',
         }),
         body: {
+          deleteImage,
           name,
           mobileno
         },
       };
 
-      console.log("this.baseUrl + '/delete-form-data-by-name', options'", this.baseUrl + '/delete-form-data-by-name', options);
-
+      console.log("deleteImage", options);
       return this.http.delete(this.baseUrl + '/delete-form-data-by-name', options)
       .pipe(tap(data =>console.log(JSON.stringify(data))), catchError(this.errorHandler));
     }

@@ -8,4 +8,5 @@ export class Form {
     createdAt?: Date;
     dob?: any;
     mobileno?: String;
+    imagePath?: string;
 }
