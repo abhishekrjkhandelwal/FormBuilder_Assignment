@@ -17,6 +17,9 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
+import { MatSelectModule } from '@angular/material/select';
 
 import { NgModule } from '@angular/core';
 const MATERIAL_MODULES = [
@@ -38,7 +41,10 @@ const MATERIAL_MODULES = [
   MatMenuModule,
   MatDialogModule,
   MatRadioModule,
-  MatPaginatorModule
+  MatPaginatorModule,
+  MatDatepickerModule,
+  MatNativeDateModule,
+  MatSelectModule
 ];
 
 @NgModule({
@@ -47,6 +53,9 @@ const MATERIAL_MODULES = [
     ],
     exports: [
       MATERIAL_MODULES
-    ]
+    ],
+    providers: [  
+      MatDatepickerModule,  
+    ],
   })
 export class MaterialModule { }

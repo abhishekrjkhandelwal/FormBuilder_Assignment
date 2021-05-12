@@ -10,6 +10,7 @@ import { SnackbarService } from '../Services/snackbar.service';
 import { indicate } from '../operator'
 import { Subject } from 'rxjs';
 import { PageEvent } from '@angular/material/paginator';
+import { HttpEvent, HttpEventType } from '@angular/common/http';
 
 @Component({
   selector: 'app-form-builder',
@@ -23,6 +24,7 @@ export class FormBuilderComponent implements OnInit {
 
   @ViewChild('fileInput', { static: false }) fileInput!: ElementRef;
 
+  progress: number = 0;
   updateData: any;
   birthDate: any;
   adhaarNumber : String[] = [];
@@ -37,13 +39,17 @@ export class FormBuilderComponent implements OnInit {
   myDate: any = new Date();
   loading$ = new Subject<boolean>();
   FILE: any;
+
   //validate patterns
   emailPattern = "[a-zA-Z0-9_.+-,;]+@(?:(?:[a-zA-Z0-9-]+\.,;)?[a-zA-Z]+\.,;)?(gmail)\.com";
   adhhaarNumber = /^[0-9]{4}[ -]?[0-9]{4}[ -]?[0-9]{4}$/;
   mobileNumber = /[0-9\+\-\ ]/;
   address = /^[#.0-9a-zA-Z\s,-]+$/;
+  
+  
+  //pagination
   totalPosts = 20;
-  postsPerPage = 2;
+  postsPerPage = 3;
   pageSizeOptions = [1, 2, 3, 4, 5, 6];
   currentPage = 1;
 
@@ -142,7 +148,27 @@ export class FormBuilderComponent implements OnInit {
         try {
           if(!this.adhaarNumber.includes(adhaarNumber)) {
             console.log('this', this.formBuilderForm.value.image);
-                this.formBuilderService.postFile(this.FILE).subscribe(data => data);
+                this.formBuilderService.postFile(this.FILE).subscribe((event: HttpEvent<any>) => {
+                   switch (event.type) {
+                     case HttpEventType.Sent:
+                       console.log("Request has been sent");
+                        break;
+                     case HttpEventType.ResponseHeader:
+                       console.log('Response header has been recevied');
+                        break;
+                     case HttpEventType.UploadProgress:
+                        if(event.total) {
+                          this.progress = Math.round(event.loaded / event.total * 100);
+                          console.log(`Uploaded! ${this.progress}%`)
+                        } 
+                       break;
+                      case HttpEventType.Response:
+                        console.log('User successfully created!', event.body); 
+                        setTimeout(() => {
+                          this.progress = 0;
+                        }, 1500)   
+                   }    
+                });
                 this.formBuilderService.postFormData(this.formBuilderForm.value).pipe(indicate(this.loading$)).subscribe( data => {
                 if(data) {
                    this.getData();

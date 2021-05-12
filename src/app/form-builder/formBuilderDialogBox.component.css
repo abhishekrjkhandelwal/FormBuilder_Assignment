@@ -62,3 +62,7 @@ mat-form-field {
       font-family: Verdana, Geneva, Tahoma, sans-serif;
     }
   }
+
+  .spinner {
+    margin-left: 40%;
+  }

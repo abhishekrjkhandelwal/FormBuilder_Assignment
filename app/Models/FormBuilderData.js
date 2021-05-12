@@ -5,7 +5,6 @@ const userSchema =  mongoose.Schema({
     email: {type: String, required: true},
     gender: {type: String,  required: true},
     createdAt: { },
-    imagePath: {type: String }
 });
 
 const formBuilderSchema = mongoose.Schema({
@@ -15,6 +14,8 @@ const formBuilderSchema = mongoose.Schema({
     address: {type: String, required: true },
     mobileno: {type: String, requird: true},
     country: {type: String, requird: true},
+    imagePath: {type: String },
+    imageUrl:  {type: String }
 });
 
 const User =  mongoose.model('User', userSchema, 'user');

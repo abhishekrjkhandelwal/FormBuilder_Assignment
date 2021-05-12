@@ -33,7 +33,7 @@ mat-form-field {
   }
   
   mat-card-header {
-    margin-left: 35%;
+    margin-left: 23%;
     font-weight: 900;
     font-family: Arial, Helvetica, sans-serif;
     font-size: large;
@@ -108,4 +108,8 @@ input[type="file"] {
 
 mat-paginator {
   margin-top: 1rem;
+}
+
+.spinner {
+  margin-left: 40%;
 }

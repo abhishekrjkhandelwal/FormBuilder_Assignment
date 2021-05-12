@@ -39,18 +39,17 @@
 
             <br />
 
-            <div>
+            <!-- <div>
              <mat-form-field class="number">
-              <input matInput name="adhaarNumber" formControlName="adhaarNumber"  placeholder="Adhaar Number" value="{{ adhaarNumber }}"  [ngClass] = "{'is-invalid': (submitted || formBuilderForm.controls.adhaarNumber.touched) && formBuilderForm.controls.adhaarNumber.errors }" />
+              <input matInput name="adhaarNumber" formControlName="adhaarNumber"  placeholder="AdhaarNumber" value="{{ adhaarNumber }}"  [ngClass] = "{'is-invalid': (submitted || formBuilderForm.controls.adhaarNumber.touched) && formBuilderForm.controls.adhaarNumber.errors }" />
               <mat-error>
                 <div>
                   <div *ngIf="((submitted || formBuilderForm.controls.adhaarNumber.touched) && formBuilderForm.controls.adhaarNumber.errors),"  class="invalid-input">Enter Valid Adhaar Number</div>
                 </div>
               </mat-error>
               </mat-form-field>
-              <mat-slide-toggle [checked]="adhaarNumber_is_active" (change)="adhaarNumber_is_active = $event.source.checked">
-              </mat-slide-toggle>
-            </div>
+              <mat-slide-toggle [checked]="adhaarNumber_is_active" (change)="adhaarNumber_is_active = $event.source.checked"></mat-slide-toggle>
+            </div> -->
             
            <div>
             <mat-form-field class="address">
@@ -90,9 +89,13 @@
             <br />
            
             <div>
-             <select id="country" formControlName="country"> {{ country }}
-               <option *ngFor="let c of countries" [ngValue]="c">{{ c }}</option>
-             </select>
+              <h3>Country</h3>
+              <mat-form-field appearance="fill">
+               <mat-label>Select Country</mat-label>
+                <mat-select id="country" formControlName="country">
+                  <mat-option *ngFor="let c of countries" [value]="c">{{ c }}</mat-option> 
+               </mat-select>
+             </mat-form-field>
              <mat-slide-toggle [checked]="country_is_active" (change)="country_is_active = $event.source.checked">
             </mat-slide-toggle>
             </div>
@@ -101,5 +104,8 @@
             <br /> 
   
             <button mat-raised-button color="primary"  [disabled]="(formBuilderForm.value.length === 0)" type="submit">Send</button>
+            <div class="spinner" *ngIf="loading$ | async">
+              <mat-spinner></mat-spinner> 
+            </div>
           </form>        
 </mat-card>

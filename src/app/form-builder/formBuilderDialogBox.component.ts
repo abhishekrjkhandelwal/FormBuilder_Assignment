@@ -29,9 +29,6 @@ export class formBuilderDialogPage implements OnInit {
       countries: string[] = ['USA', 'UK', 'Canada', 'India'];
       default = 'UK';
       userName!: any;
-      mobileNumber = /[0-9\+\-\ ]/;
-      emailPattern = "[a-zA-Z0-9_.+-,;]+@(?:(?:[a-zA-Z0-9-]+\.,;)?[a-zA-Z]+\.,;)?(gmail)\.com";
-      adhhaarNumber = /^[0-9]{4}[ -]?[0-9]{4}[ -]?[0-9]{4}$/;
       myDate: any = new Date();
       address!: string;
       country!: string;
@@ -43,7 +40,7 @@ export class formBuilderDialogPage implements OnInit {
       toggleOption: any;
       loading$ = new Subject<boolean>();
       totalPosts = 10;
-      postsPerPage = 2;
+      postsPerPage = 3;
       pageSizeOptions = [1, 2, 3, 4, 5, 6];
       currentPage = 1;
 
@@ -57,6 +54,12 @@ export class formBuilderDialogPage implements OnInit {
       country_is_active = false;
       resultArray = [];
 
+
+      //validation patterns 
+      mobileNumber = /[0-9\+\-\ ]/;
+      emailPattern = "[a-zA-Z0-9_.+-,;]+@(?:(?:[a-zA-Z0-9-]+\.,;)?[a-zA-Z]+\.,;)?(gmail)\.com";
+      AdhaarNumber = /^[0-9]{4}[ -]?[0-9]{4}[ -]?[0-9]{4}$/;
+
       ngOnInit(): void {
         this.birthDate = new Date();        
         this.formBuilderForm = this.formBuilder.group({
@@ -66,7 +69,7 @@ export class formBuilderDialogPage implements OnInit {
          ]) ],
          gender: ['male', [Validators.required]],
          birthDate: [' ', [Validators.required]],
-         adhaarNumber: ['', [Validators.required, Validators.pattern(this.adhhaarNumber)]],
+         adhaarNumber: ['', [Validators.required, Validators.pattern(this.AdhaarNumber)]],
          mobileno: ['', [Validators.required, Validators.pattern(this.mobileNumber)]],
          address: ['', [Validators.required, Validators.pattern(this.address)]],
          country: ['', [Validators.required]],
@@ -136,7 +139,7 @@ export class formBuilderDialogPage implements OnInit {
                         else if(arr == "adhaarNumber") this.formBuilderForm.value[`${arr}`] = this.adhaarNumber;                        
                         else if(arr == "address") this.formBuilderForm.value[`${arr}`] = this.address;                        
                         else if(arr == "mobileno") this.formBuilderForm.value[`${arr}`] = this.mobileno;                        
-                        else if(arr == "birthDate") this.formBuilderForm.value[`${arr}`] = this.name;                        
+                        else if(arr == "birthDate") this.formBuilderForm.value[`${arr}`] = this.birthDate;                        
                         else if(arr == "country") this.formBuilderForm.value[`${arr}`] = this.country;   
                     }                   
                     console.log(this.formBuilderForm.value);
@@ -154,18 +157,20 @@ export class formBuilderDialogPage implements OnInit {
         getData(): void {
                     try {
                     this.formBuilderService.getFormData(this.postsPerPage, this.currentPage).pipe(indicate(this.loading$)).subscribe(data => {
-                      console.log("formdata", data.formdata);
-                    for(let row in data.formdata) {
-                      if(this.adhaarNumber == data.formdata[row].creators[row].adhaarNumber) {
-                      this.name = data.formdata[row].name,
-                      this.email = data.formdata[row].email,
-                      this.adhaarNumber = data.formdata[row].creators[row].adhaarNumber;
-                      this.country = data.formdata[row].creators[row].country,
-                      this.mobileNumber = data.formdata[row].creators[row].mobileNumber,
-                      this.birthDate = data.formdata[row].creators[row].birthDate,
-                      this.address = data.formdata[row].creators[row].address,
-                      this.mobileno = data.formdata[row].creators[row].mobileno;
-                      this.gender = data.formdata[row].gender;
+                      console.log("formdata", typeof data.formdata);
+                          if(data.formdata.length != 0)  { 
+                            for(let row in data.formdata) {
+                            if(this.adhaarNumber == data.formdata[row].creators[row].adhaarNumber) {
+                            this.name = data.formdata[row].name,
+                            this.email = data.formdata[row].email,
+                            this.adhaarNumber = data.formdata[row].creators[row].adhaarNumber;
+                            this.country = data.formdata[row].creators[row].country,
+                            this.mobileNumber = data.formdata[row].creators[row].mobileNumber,
+                            this.birthDate = data.formdata[row].creators[row].birthDate,
+                            this.address = data.formdata[row].creators[row].address,
+                            this.mobileno = data.formdata[row].creators[row].mobileno;
+                            this.gender = data.formdata[row].gender;
+                        }
                       }
                     }
                     this.snakbarService.openSnackBar("Fetch User Details")

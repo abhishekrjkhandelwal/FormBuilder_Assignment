@@ -2,6 +2,8 @@ const schema = require('../Models/FormBuilderData');
 const multer = require('multer');
 const fs = require("fs");
 const path = require("path");
+const _ = require("underscore");
+const async = require("async");
 
 const MIME_TYPE_MAP = {
     'image/png': 'png',
@@ -35,46 +37,51 @@ const sendFile =  (upload.array('file', 2), async (req, res) =>  {
 
 /** Post fromData */
 const postData = async (req, res) => {
-
-    sendFile().then(data => console.log('File Uploaded Successfully'));
-    const user = new schema.User({
+    var user = new schema.User({
         name: req.body.formData.name,
         email: req.body.formData.email,
         gender: req.body.formData.gender,
         createdAt: req.body.formData.createdAt,
-        imagePath: sendUrl,
         userdetails: "fid",
     });
-    const userDetails = new schema.userDetails({    
+    var userDetails = new schema.userDetails({    
         fid: "fid",
         birthDate: req.body.formData.birthDate,
         email: req.body.formData.email,
         adhaarNumber: req.body.formData.adhaarNumber,
         address: req.body.formData.address,
         mobileno: req.body.formData.mobileno,
-        country: req.body.formData.country
+        country: req.body.formData.country,
+        imagePath: sendUrl,
+        imageUrl: imagePath,
     });
 
-    await user.save().then((user) => {
-          res.status(200).json({
-              message: "user created successfully",
-              user: {
-                  ...user,
-                  imagePath: user.sendUrl,
-              }
+
+    (async.parallel([
+        function (callback) {
+                user.save().then((user) => {
+                callback(null, user);       
           })      
-    })
-    .catch((error) => {
-          res.status(400).json({error: error});
-     })
+        },
 
-
-    await userDetails.save().then((userDetails) => {
-        res.status(200).json(userDetails)      
-    })
-    .catch((error) => {
-        res.status(400).json({error: error});
-    })
+        function (callback) {    
+                userDetails.save().then((userDetails) => {
+                callback(null, userDetails)      
+            })
+           },
+        ],
+        function (err, result) {           
+            if(err) {
+                res.status(400).json({
+                    message: "user not created",
+                })
+            }
+            res.status(200).json({
+                message: result
+            })
+            console.log(result);
+        }
+    ))
 }
 
 /** fetch formData */
@@ -108,7 +115,6 @@ const getData = async (req, res) => {
                     name: doc.name,
                     email: doc.email,
                     gender: doc.gender,
-                    imagePath: doc.imagePath,
                     creators: doc.creators,
                     createdAt: doc.createdAt,
                     request: {
@@ -154,9 +160,8 @@ const updateData = async (req, res) => {
             country: req.body.formData.country, 
         }
         
-       await schema.User.findOneAndUpdate({ email: email},
+            await schema.User.findOneAndUpdate({ email: email},
             {$set: setUserData},
-            {useFindAndModify: false},
             {new : true},
             (err, doc) => {
                  if(err) {
@@ -166,13 +171,12 @@ const updateData = async (req, res) => {
 
             await schema.userDetails.findOneAndUpdate({adhaarNumber: adhaarNumber},
                 {$set: setUserDetails},
-                {useFindAndModify: false},
                 {new : true},
                 (err, doc) => {
                      if(err) {
                          console.log("wrong when data updating");
                      }
-                  })
+             })
             
             await schema.User.aggregate([
                     {
@@ -208,38 +212,50 @@ const updateData = async (req, res) => {
 
 /** Delete fromData */
 const deleteData = async (req, res) => {
-    const user = new schema.User({
+    var user = new schema.User({
         name: req.body.name,
-        imagePath: req.body.deleteImage
     });   
-    const userDetails = new schema.userDetails({
+    var userDetails = new schema.userDetails({
         mobileno: Number(req.body.mobileno),
+        imagePath: req.body.deleteImage
     })
 
-    
-   await schema.User.deleteOne({name: user.name, imagePath: user.imagePath}, function(err) {
-        try {
-            console.log("imagedata", imagePath);
-            fs.unlinkSync(imagePath)
-            console.log("Successfully deleted the file from server")
-            delete imagePath;
-            res.status(200).json({
-                message: "user is deleted"
+    console.log("outside async");
+    (async.parallel([
+        function (callback) {
+            schema.User.deleteOne({name: user.name}, function(err, results) {
+                if(err) {
+                    console.log("err", err);
+                }
+                callback(null, results);
             })
-          } catch(err) {
-            res.status(400).json({
-                message: "user not deleted"
-            })   
-            throw err
-          }
-    }) 
-    await schema.userDetails.deleteOne({mobileno: userDetails.mobileno}, function(err, result) {
-            if(err) {
-                throw err;
-            } else {
-                res.status(200).json(result);
-            }
-    })
+        },
+
+        function (callback) {    
+            schema.userDetails.deleteOne({mobileno: userDetails.mobileno}, function(err, results) {
+                
+                console.log("mobileno", userDetails.mobileno);
+                console.log("imagePath", imagePath);
+
+                try {
+                    console.log("imagePath", imagePath);
+                    fs.unlink(imagePath, (err) => err);
+                    console.log("Successfully deleted the file from server") 
+                    callback(null, results);           
+                  } catch(err) {               
+                    throw err;
+                  }
+               })
+           },
+        ],
+
+        function (err, result) {
+            res.status(200).json({
+                message: result
+            })
+            console.log(result);
+        }
+    ))
 }
 
 module.exports = {

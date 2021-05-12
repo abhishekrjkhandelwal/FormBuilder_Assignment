@@ -45,7 +45,7 @@ export class FormBuilderService {
     } 
 
     //http client api for update user
-    updateFormBuilderServiceByName(email:string, adhaarNumber: number, formData: Form): Observable<any> {
+    updateFormBuilderServiceByName(email:string, adhaarNumber: number, formData: any): Observable<any> {
       const userInfo = {
         email,
         adhaarNumber,

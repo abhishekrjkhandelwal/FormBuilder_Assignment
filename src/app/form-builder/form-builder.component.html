@@ -73,27 +73,37 @@
      <br />
      
      <h3>Country</h3>
-     <select id="country" formControlName="country">
-       <option *ngFor="let c of countries" [ngValue]="c">{{ c }}</option>
-     </select>
-
+     <mat-form-field appearance="fill">
+      <mat-label>Select Country</mat-label>
+       <mat-select id="country" formControlName="country">
+         <mat-option *ngFor="let c of countries" [value]="c">{{ c }}</mat-option> 
+      </mat-select>
+    </mat-form-field>
      <br />
      <br />
-
-     <!-- <div>
-        <button mat-stroked-button type="button" (click)="filePicker.click()" >Pick Profile Image</button>
-        <input name="filePICK" id="fileItem" accept="image/*" type="file" #filePicker (change)="onImagePicked($event)">
-     </div> -->
 
        <div>
          <input #fileInput name="myFile" type="file" (change)="onFileUpload($event)">
-         <button (click)="fileInput.click()" >FILE</button>
+         <button mat-stroked-button (click)="fileInput.click()" accept="image/*">FILE</button>
       </div>
+
+      <br>
+      <br>
+      
+      <div class="progress" *ngIf="progress > 0">
+        <mat-progress-bar mode="determinate" value="{{progress}}" aria-valuemin="0" aria-valuemax="100"></mat-progress-bar>
+        <div class="progress-bar" attr.aria-valuenow="{{progress}}" aria-valuemin="0" aria-valuemax="100" 
+        [ngStyle]="{width:progress+'%'}">
+        {{progress}}%</div>
+    </div>
 
     <br />
     <br />
     <button mat-raised-button color="primary" (click)="postFormData();" [disabled]="(formBuilderForm.value.length === 0)" type="submit">Send</button>
   </form>
+  <div class="spinner" *ngIf="loading$ | async">
+    <mat-spinner></mat-spinner> 
+  </div>
 
 </mat-card>
 </div>
@@ -101,7 +111,7 @@
 <br />
 <br />
 
-<table class="styled-table" style="margin: 20% 15% 10% 15%">
+<table class="styled-table" style="margin: 20% 15% 10% 15%" *ngIf="formData.length !== 0">
    <thead>
      <th>Image</th>
      <th>Name</th>
@@ -120,7 +130,7 @@
    <tbody>
      <tr *ngFor = "let formdata of formData;let i = index">
         <td>
-          <img [src] = "formdata.imagePath">
+          <img [src] = "formdata.creators[i].imagePath">
         </td>
         <td>{{ formdata.name }}</td>
         <td>{{ formdata.email }}</td>
@@ -132,11 +142,15 @@
         <td>{{ formdata.creators[i].mobileno }}</td>
         <td>{{ formdata.createdAt }}</td>
         <td><button id="update" (click)="openformBuilderDialog($event, formdata.email, formdata.creators[i].adhaarNumber)">Update</button></td>
-        <td><button id="delete" (click)="deleteFormDataByName($event, formdata.imagePath ,formdata.name, formdata.creators[i].mobileno , i)" >Delete</button></td>   
+        <td><button id="delete" (click)="deleteFormDataByName($event, formdata.creators[i].imageUrl ,formdata.name, formdata.creators[i].mobileno , i)" >Delete</button></td>   
      </tr>
    </tbody>
 </table>
+<div class="spinner" *ngIf="loading$ | async">
+  <mat-spinner></mat-spinner> 
+</div>
 
+<h1 *ngIf="formData.length === 0" style="font-size:x-large; text-align: center;">Users not exists</h1>
 <mat-paginator [length]="totalPosts"  [pageSize]="postsPerPage" [pageSizeOptions]="pageSizeOptions" (page)="onChangedPage($event)" ></mat-paginator>
 
 <br />
